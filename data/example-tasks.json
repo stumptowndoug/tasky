@@ -1,0 +1,217 @@
+{
+  "boards": [
+    {
+      "id": "default",
+      "name": "My Tasks",
+      "columns": [
+        {
+          "id": "todo",
+          "name": "To Do",
+          "order": 0
+        },
+        {
+          "id": "in-progress",
+          "name": "In Progress",
+          "order": 1
+        },
+        {
+          "id": "done",
+          "name": "Done",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "project-board",
+      "name": "Project Alpha",
+      "columns": [
+        {
+          "id": "backlog",
+          "name": "Backlog",
+          "order": 0
+        },
+        {
+          "id": "design",
+          "name": "Design",
+          "order": 1
+        },
+        {
+          "id": "development",
+          "name": "Development",
+          "order": 2
+        },
+        {
+          "id": "testing",
+          "name": "Testing",
+          "order": 3
+        },
+        {
+          "id": "deployed",
+          "name": "Deployed",
+          "order": 4
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-simple",
+      "boardId": "default",
+      "title": "Simple task with minimal fields",
+      "status": "todo",
+      "createdAt": "2025-01-06T10:00:00Z",
+      "updatedAt": "2025-01-06T10:00:00Z"
+    },
+    {
+      "id": "task-with-description",
+      "boardId": "default",
+      "title": "Task with description",
+      "status": "todo",
+      "description": "This task has a longer description that explains what needs to be done in more detail.",
+      "createdAt": "2025-01-06T10:05:00Z",
+      "updatedAt": "2025-01-06T10:05:00Z"
+    },
+    {
+      "id": "task-with-priority",
+      "boardId": "default",
+      "title": "High priority task",
+      "status": "in-progress",
+      "description": "This is an urgent task that needs immediate attention.",
+      "priority": "high",
+      "createdAt": "2025-01-06T10:10:00Z",
+      "updatedAt": "2025-01-06T10:10:00Z"
+    },
+    {
+      "id": "task-with-tags",
+      "boardId": "default",
+      "title": "Task with tags",
+      "status": "in-progress",
+      "description": "Tags help categorize and filter tasks.",
+      "priority": "medium",
+      "tags": ["frontend", "ui", "bug-fix"],
+      "createdAt": "2025-01-06T10:15:00Z",
+      "updatedAt": "2025-01-06T10:15:00Z"
+    },
+    {
+      "id": "task-fully-featured",
+      "boardId": "default",
+      "title": "Fully featured task with all fields",
+      "status": "in-progress",
+      "description": "This task demonstrates all possible custom fields you can add.",
+      "priority": "critical",
+      "tags": ["important", "deadline", "customer-facing"],
+      "assignee": "Doug",
+      "dueDate": "2025-01-15",
+      "estimatedHours": 8,
+      "actualHours": 5.5,
+      "progress": 75,
+      "createdAt": "2025-01-06T10:20:00Z",
+      "updatedAt": "2025-01-06T12:30:00Z"
+    },
+    {
+      "id": "task-research",
+      "boardId": "default",
+      "title": "Research vector search implementation",
+      "status": "todo",
+      "description": "Investigate different approaches for implementing vector search.",
+      "priority": "medium",
+      "tags": ["research", "ai", "technical"],
+      "estimatedHours": 4,
+      "resources": [
+        "https://www.pinecone.io/learn/vector-database/",
+        "https://github.com/chroma-core/chroma"
+      ],
+      "notes": "Consider Pinecone, Chroma, or Weaviate. Need to evaluate cost vs performance.",
+      "createdAt": "2025-01-06T10:25:00Z",
+      "updatedAt": "2025-01-06T10:25:00Z"
+    },
+    {
+      "id": "task-completed",
+      "boardId": "default",
+      "title": "Completed task example",
+      "status": "done",
+      "description": "This task has been completed successfully.",
+      "priority": "low",
+      "tags": ["documentation"],
+      "assignee": "Doug",
+      "completedAt": "2025-01-06T14:00:00Z",
+      "actualHours": 2,
+      "createdAt": "2025-01-06T09:00:00Z",
+      "updatedAt": "2025-01-06T14:00:00Z"
+    },
+    {
+      "id": "task-blocked",
+      "boardId": "default",
+      "title": "Blocked task waiting on dependencies",
+      "status": "todo",
+      "description": "This task is blocked by other tasks that must be completed first.",
+      "priority": "high",
+      "tags": ["blocked", "backend"],
+      "blockedBy": ["task-fully-featured", "task-research"],
+      "blockedReason": "Waiting for API design to be finalized",
+      "createdAt": "2025-01-06T10:30:00Z",
+      "updatedAt": "2025-01-06T10:30:00Z"
+    },
+    {
+      "id": "task-project-alpha-1",
+      "boardId": "project-board",
+      "title": "Design landing page mockups",
+      "status": "design",
+      "description": "Create high-fidelity mockups for the new landing page.",
+      "priority": "high",
+      "tags": ["design", "marketing"],
+      "assignee": "Design Team",
+      "dueDate": "2025-01-10",
+      "estimatedHours": 6,
+      "figmaLink": "https://figma.com/file/...",
+      "createdAt": "2025-01-05T09:00:00Z",
+      "updatedAt": "2025-01-06T10:35:00Z"
+    },
+    {
+      "id": "task-project-alpha-2",
+      "boardId": "project-board",
+      "title": "Implement authentication flow",
+      "status": "development",
+      "description": "Build OAuth integration with Google and GitHub.",
+      "priority": "critical",
+      "tags": ["backend", "security", "auth"],
+      "assignee": "Backend Team",
+      "estimatedHours": 12,
+      "actualHours": 8,
+      "progress": 60,
+      "pullRequest": "https://github.com/org/repo/pull/123",
+      "createdAt": "2025-01-04T14:00:00Z",
+      "updatedAt": "2025-01-06T11:00:00Z"
+    },
+    {
+      "id": "task-custom-fields-demo",
+      "boardId": "default",
+      "title": "Demonstrates custom fields flexibility",
+      "status": "todo",
+      "description": "You can add ANY custom fields - Tasky will preserve them!",
+      "priority": "low",
+      "tags": ["demo", "example"],
+      "customField1": "Any string value",
+      "customField2": 42,
+      "customField3": true,
+      "customField4": ["array", "of", "values"],
+      "customObject": {
+        "nested": "You can even nest objects",
+        "value": 123
+      },
+      "sentiment": "😊",
+      "color": "#3b82f6",
+      "category": "Education",
+      "relatedLinks": [
+        "https://example.com/docs",
+        "https://example.com/api"
+      ],
+      "createdAt": "2025-01-06T10:40:00Z",
+      "updatedAt": "2025-01-06T10:40:00Z"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastModified": "2025-01-06T10:40:00Z"
+  }
+}

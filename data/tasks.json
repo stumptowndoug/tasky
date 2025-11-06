@@ -1,0 +1,72 @@
+{
+  "boards": [
+    {
+      "id": "default",
+      "name": "My Tasks",
+      "columns": [
+        {
+          "id": "todo",
+          "name": "To Do",
+          "order": 0
+        },
+        {
+          "id": "in-progress",
+          "name": "In Progress",
+          "order": 1
+        },
+        {
+          "id": "done",
+          "name": "Done",
+          "order": 2
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1",
+      "boardId": "default",
+      "title": "Welcome to Tasky!",
+      "status": "done",
+      "description": "This is your first task. You can edit it, move it to different columns, or delete it.",
+      "createdAt": "2025-01-06T10:00:00Z",
+      "updatedAt": "2025-11-06T23:30:00Z"
+    },
+    {
+      "id": "task-2",
+      "boardId": "default",
+      "title": "LLM agents can manage these tasks",
+      "status": "in-progress",
+      "description": "Claude Code and other AI agents can directly edit this JSON file to add, update, or move tasks.",
+      "createdAt": "2025-01-06T10:05:00Z",
+      "updatedAt": "2025-01-06T10:05:00Z",
+      "priority": "high",
+      "tags": ["ai", "automation"]
+    },
+    {
+      "id": "task-3",
+      "boardId": "default",
+      "title": "Customize your board",
+      "status": "done",
+      "description": "Add custom fields, create new boards, or modify columns as needed.",
+      "createdAt": "2025-01-06T10:10:00Z",
+      "updatedAt": "2025-01-06T10:10:00Z",
+      "customField": "You can add any custom fields you want!"
+    },
+    {
+      "id": "task-4",
+      "boardId": "default",
+      "title": "Real-time file watching test",
+      "status": "todo",
+      "description": "This task was added via Claude Code to test the real-time file watching feature!",
+      "createdAt": "2025-11-06T23:12:00Z",
+      "updatedAt": "2025-11-06T23:12:00Z",
+      "priority": "medium",
+      "tags": ["test", "real-time"]
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastModified": "2025-11-06T23:12:00Z"
+  }
+}
