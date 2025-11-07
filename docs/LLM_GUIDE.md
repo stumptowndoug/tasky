@@ -419,10 +419,10 @@ Instead of direct file editing, you can also use the REST API:
 
 ```bash
 # Get all tasks
-GET http://localhost:3000/api/tasks
+GET http://localhost:3737/api/tasks
 
 # Create task
-POST http://localhost:3000/api/tasks
+POST http://localhost:3737/api/tasks
 {
   "boardId": "default",
   "title": "New task",
@@ -431,14 +431,14 @@ POST http://localhost:3000/api/tasks
 }
 
 # Update task
-PUT http://localhost:3000/api/tasks/[taskId]
+PUT http://localhost:3737/api/tasks/[taskId]
 {
   "title": "Updated title",
   "status": "done"
 }
 
 # Delete task
-DELETE http://localhost:3000/api/tasks/[taskId]
+DELETE http://localhost:3737/api/tasks/[taskId]
 ```
 
 However, **direct file editing is recommended** for LLM agents as it's simpler and more reliable.

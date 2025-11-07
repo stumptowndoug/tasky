@@ -182,7 +182,7 @@ Then try:
 "Add a task called 'Test MCP integration' to my todo list"
 ```
 
-The task should appear in your kanban board at http://localhost:3000
+The task should appear in your kanban board at http://localhost:3737
 
 ---
 

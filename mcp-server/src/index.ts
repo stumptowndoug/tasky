@@ -14,10 +14,15 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-// Path to tasks.json (relative to project root)
-const TASKS_FILE = join(process.cwd(), "../data/tasks.json");
+// Get the directory of this file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Path to tasks.json (relative to this file: mcp-server/dist/index.js -> ../../data/tasks.json)
+const TASKS_FILE = join(__dirname, "../../data/tasks.json");
 
 /**
  * Read tasks data from file
@@ -38,10 +43,23 @@ async function writeTasksData(data: any) {
 }
 
 /**
- * Generate unique task ID
+ * Generate sequential task ID
+ * Finds the highest existing task number and increments it
  */
-function generateTaskId() {
-  return `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+function generateTaskId(existingTasks: any[]) {
+  // Extract task numbers from existing IDs (format: task-{number})
+  const taskNumbers = existingTasks
+    .map((task) => {
+      const match = task.id.match(/^task-(\d+)$/);
+      return match ? parseInt(match[1], 10) : 0;
+    })
+    .filter((num) => !isNaN(num));
+
+  // Find the highest number, default to 0 if no valid tasks
+  const maxNumber = taskNumbers.length > 0 ? Math.max(...taskNumbers) : 0;
+
+  // Return next sequential ID
+  return `task-${maxNumber + 1}`;
 }
 
 /**
@@ -84,7 +102,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "add_task",
-        description: "Add a new task to the board. Supports custom fields - any additional properties beyond core fields will be preserved.",
+        description: "Add a new task to the board. Task IDs are automatically generated sequentially (task-1, task-2, etc.). Supports custom fields - any additional properties beyond core fields will be preserved.",
         inputSchema: {
           type: "object",
           properties: {
@@ -267,7 +285,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const data = await readTasksData();
 
         const newTask: any = {
-          id: generateTaskId(),
+          id: generateTaskId(data.tasks),
           boardId: args.boardId || "default",
           title: args.title,
           status: args.status || "todo",

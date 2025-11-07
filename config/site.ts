@@ -11,8 +11,7 @@ export const siteConfig = {
     },
   ],
   links: {
-    twitter: "",
-    github: "https://github.com/yourusername/tasky",
+    github: "https://github.com/stumptowndoug/tasky",
     docs: "/docs/LLM_GUIDE.md",
   },
 }
