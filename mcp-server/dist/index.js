@@ -560,7 +560,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 // Determine the target board for column validation
                 const targetBoardId = args.boardId !== undefined
                     ? String(args.boardId)
-                    : (data.tasks[taskIndex].boardId || "default");
+                    : data.tasks[taskIndex].boardId || "default";
                 // Validate column if status is being updated
                 if (args.status !== undefined) {
                     const columnValidationError = validateColumnExists(data, targetBoardId, String(args.status));
