@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getBoardById, updateBoard, deleteBoard } from "@/lib/tasks"
-import type { UpdateBoardRequest, ApiResponse } from "@/lib/types"
+
+import { deleteBoard, getBoardById, updateBoard } from "@/lib/tasks"
+import type { ApiResponse, UpdateBoardRequest } from "@/lib/types"
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 /**
  * GET /api/boards/[id]
  * Returns a single board by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
-    const board = await getBoardById(params.id)
+    const { id } = await params
+    const board = await getBoardById(id)
 
     if (!board) {
       return NextResponse.json<ApiResponse>(
@@ -48,13 +47,11 @@ export async function GET(
  * PUT /api/boards/[id]
  * Updates a board
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function PUT(request: NextRequest, { params }: RouteContext) {
   try {
+    const { id } = await params
     const body: Partial<UpdateBoardRequest> = await request.json()
-    const updatedBoard = await updateBoard(params.id, body)
+    const updatedBoard = await updateBoard(id, body)
 
     if (!updatedBoard) {
       return NextResponse.json<ApiResponse>(
@@ -85,12 +82,10 @@ export async function PUT(
  * DELETE /api/boards/[id]
  * Deletes a board and all its tasks
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
   try {
-    const success = await deleteBoard(params.id)
+    const { id } = await params
+    const success = await deleteBoard(id)
 
     if (!success) {
       return NextResponse.json<ApiResponse>(
@@ -104,7 +99,7 @@ export async function DELETE(
 
     return NextResponse.json<ApiResponse>({
       success: true,
-      data: { id: params.id },
+      data: { id },
     })
   } catch (error) {
     return NextResponse.json<ApiResponse>(

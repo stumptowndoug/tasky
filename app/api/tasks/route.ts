@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getTasks, createTask, readTasksData } from "@/lib/tasks"
-import type { CreateTaskRequest, ApiResponse } from "@/lib/types"
+
+import { createTask, getTasks, readTasksData } from "@/lib/tasks"
+import type { ApiResponse, CreateTaskRequest } from "@/lib/types"
 
 /**
  * GET /api/tasks

@@ -153,7 +153,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         },
                         status: {
                             type: "string",
-                            description: "Status/column ID (e.g., 'todo', 'in-progress', 'done'). Defaults to 'todo'",
+                            description: "Status/column ID (e.g., 'todo', 'in-progress', 'done'). If not specified, uses the first column of the target board.",
                         },
                         description: {
                             type: "string",
@@ -448,7 +448,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         isError: true,
                     };
                 }
-                const status = String(args.status || "todo");
+                // Default to first column of the target board if status not provided
+                let status;
+                if (args.status) {
+                    status = String(args.status);
+                }
+                else {
+                    const board = data.boards.find((b) => b.id === boardId);
+                    const firstColumn = board.columns.sort((a, b) => a.order - b.order)[0];
+                    status = firstColumn.id;
+                }
                 // Validate column exists
                 const columnValidationError = validateColumnExists(data, boardId, status);
                 if (columnValidationError) {
