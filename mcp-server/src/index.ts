@@ -237,6 +237,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "string",
               description: "Task ID to update (required)",
             },
+            boardId: {
+              type: "string",
+              description: "Move task to a different board (optional)",
+            },
             title: {
               type: "string",
               description: "New title (optional)",
@@ -606,12 +610,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           }
         }
 
+        // Validate new board if boardId is being updated
+        if (args.boardId !== undefined) {
+          const boardValidationError = validateBoardExists(data, String(args.boardId))
+          if (boardValidationError) {
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: boardValidationError.error,
+                },
+              ],
+              isError: true,
+            }
+          }
+        }
+
+        // Determine the target board for column validation
+        const targetBoardId = args.boardId !== undefined
+          ? String(args.boardId)
+          : (data.tasks[taskIndex].boardId || "default")
+
         // Validate column if status is being updated
         if (args.status !== undefined) {
-          const taskBoardId = data.tasks[taskIndex].boardId || "default"
           const columnValidationError = validateColumnExists(
             data,
-            taskBoardId,
+            targetBoardId,
             String(args.status)
           )
           if (columnValidationError) {
@@ -631,6 +655,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           updatedAt: new Date().toISOString(),
         }
 
+        if (args.boardId !== undefined) updates.boardId = args.boardId
         if (args.title !== undefined) updates.title = args.title
         if (args.status !== undefined) updates.status = args.status
         if (args.description !== undefined)
