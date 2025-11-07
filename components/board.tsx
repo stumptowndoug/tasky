@@ -65,7 +65,7 @@ export function Board({ boardId }: BoardProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-muted-foreground">Loading tasks...</p>
       </div>
     )
@@ -73,7 +73,7 @@ export function Board({ boardId }: BoardProps) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-destructive">Error: {error}</p>
       </div>
     )
@@ -83,7 +83,7 @@ export function Board({ boardId }: BoardProps) {
 
   if (!board) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-muted-foreground">Board not found</p>
       </div>
     )
@@ -97,7 +97,7 @@ export function Board({ boardId }: BoardProps) {
   const sortedColumns = [...board.columns].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4 px-1 min-h-[600px]">
+    <div className="flex min-h-[600px] gap-4 overflow-x-auto px-1 pb-4">
       {sortedColumns.map((column) => {
         const columnTasks = boardTasks.filter(
           (task) => task.status === column.id

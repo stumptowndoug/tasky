@@ -159,6 +159,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                             type: "string",
                             description: "Task description (optional)",
                         },
+                        dueDate: {
+                            type: "string",
+                            description: "Due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+                        },
+                        reminderDate: {
+                            type: "string",
+                            description: "Reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
+                        },
                         priority: {
                             type: "string",
                             description: "Priority level: low, medium, high, critical (optional)",
@@ -197,6 +205,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         description: {
                             type: "string",
                             description: "New description (optional)",
+                        },
+                        dueDate: {
+                            type: "string",
+                            description: "New due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+                        },
+                        reminderDate: {
+                            type: "string",
+                            description: "New reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
                         },
                         priority: {
                             type: "string",
@@ -480,6 +496,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 };
+                if (args.dueDate)
+                    newTask.dueDate = args.dueDate;
+                if (args.reminderDate)
+                    newTask.reminderDate = args.reminderDate;
                 if (args.priority)
                     newTask.priority = args.priority;
                 if (args.tags)
@@ -537,6 +557,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     updates.status = args.status;
                 if (args.description !== undefined)
                     updates.description = args.description;
+                if (args.dueDate !== undefined)
+                    updates.dueDate = args.dueDate;
+                if (args.reminderDate !== undefined)
+                    updates.reminderDate = args.reminderDate;
                 if (args.priority !== undefined)
                     updates.priority = args.priority;
                 if (args.tags !== undefined)

@@ -3,7 +3,8 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, usePathname } from "next/navigation"
+import { Calendar } from "lucide-react"
 
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
@@ -17,6 +18,7 @@ interface Board {
 export function MainNav() {
   const [boards, setBoards] = useState<Board[]>([])
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const currentBoardId = searchParams.get("board") || "default"
 
   const fetchBoards = () => {
@@ -61,7 +63,7 @@ export function MainNav() {
   return (
     <div className="flex gap-6 md:gap-10">
       <Link href="/" className="flex items-center space-x-2">
-        <Icons.logo className="h-6 w-6" />
+        <Icons.logo className="size-6" />
         <span className="inline-block font-bold">{siteConfig.name}</span>
       </Link>
       {boards.length > 0 && (
@@ -72,7 +74,7 @@ export function MainNav() {
               href={`/?board=${board.id}`}
               className={cn(
                 "flex items-center text-sm font-medium transition-colors hover:text-foreground",
-                currentBoardId === board.id
+                pathname === "/" && currentBoardId === board.id
                   ? "text-foreground"
                   : "text-muted-foreground"
               )}
@@ -80,6 +82,18 @@ export function MainNav() {
               {board.name}
             </Link>
           ))}
+          <Link
+            href="/calendar"
+            className={cn(
+              "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-foreground",
+              pathname === "/calendar"
+                ? "text-foreground"
+                : "text-muted-foreground"
+            )}
+          >
+            <Calendar className="size-4" />
+            Calendar
+          </Link>
         </nav>
       )}
     </div>

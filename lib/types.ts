@@ -33,6 +33,8 @@ export interface Task {
   title: string
   status: string // Column ID
   description?: string
+  dueDate?: string // ISO date string - when the task should be completed
+  reminderDate?: string // ISO date string - when to remind about the task
   createdAt: string
   updatedAt: string
   // Custom fields: Any additional properties are allowed
