@@ -1,7 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { Check, Copy } from "lucide-react"
+
 import { Task } from "@/lib/types"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,9 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Copy, Check } from "lucide-react"
+
 import { TaskDetailDialog } from "./task-detail-dialog"
 
 interface TaskCardProps {
@@ -23,7 +25,16 @@ export function TaskCard({ task }: TaskCardProps) {
   const [copied, setCopied] = useState(false)
 
   // Extract core fields
-  const { id, boardId, title, status, description, createdAt, updatedAt, ...customFields } = task
+  const {
+    id,
+    boardId,
+    title,
+    status,
+    description,
+    createdAt,
+    updatedAt,
+    ...customFields
+  } = task
 
   // Extract common custom fields for special display
   const priority = customFields.priority as string | undefined
@@ -45,7 +56,10 @@ export function TaskCard({ task }: TaskCardProps) {
     <>
       <Card className="flex h-[180px] flex-col overflow-hidden transition-all hover:shadow-lg">
         {/* Card Content - Clickable */}
-        <div className="flex flex-1 cursor-pointer flex-col overflow-hidden" onClick={() => setIsOpen(true)}>
+        <div
+          className="flex flex-1 cursor-pointer flex-col overflow-hidden"
+          onClick={() => setIsOpen(true)}
+        >
           <CardHeader className="shrink-0 pb-3">
             <div className="mb-2 flex items-start justify-between gap-2">
               <CardTitle className="line-clamp-2 flex-1 text-base font-medium leading-snug">
@@ -91,7 +105,8 @@ export function TaskCard({ task }: TaskCardProps) {
                   ))}
                   {otherCustomFields.length > 1 && (
                     <div className="text-xs text-muted-foreground">
-                      +{otherCustomFields.length - 1} more field{otherCustomFields.length > 2 ? 's' : ''}
+                      +{otherCustomFields.length - 1} more field
+                      {otherCustomFields.length > 2 ? "s" : ""}
                     </div>
                   )}
                 </div>
@@ -102,7 +117,10 @@ export function TaskCard({ task }: TaskCardProps) {
 
         {/* Task ID Bar - Full width at bottom */}
         <div className="flex shrink-0 items-center justify-between border-t border-border bg-card px-3 py-2">
-          <code className="text-xs font-bold tracking-wide" style={{ color: 'hsl(191.6 91.4% 36.5%)' }}>
+          <code
+            className="text-xs font-bold tracking-wide"
+            style={{ color: "hsl(191.6 91.4% 36.5%)" }}
+          >
             {id}
           </code>
           <Button

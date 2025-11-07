@@ -2,9 +2,10 @@
  * Calendar utilities for transforming tasks into calendar features
  */
 
-import type { Feature, Status } from '@/components/ui/shadcn-io/calendar'
-import { Task, Board } from './types'
-import { getBoardColor, getBoardColorHex } from './board-colors'
+import type { Feature, Status } from "@/components/ui/shadcn-io/calendar"
+
+import { getBoardColor, getBoardColorHex } from "./board-colors"
+import { Board, Task } from "./types"
 
 /**
  * Transform tasks into calendar features
@@ -15,9 +16,9 @@ export function tasksToCalendarFeatures(
   boards: Board[]
 ): Feature[] {
   return tasks
-    .filter(task => task.dueDate) // Only show tasks with due dates
-    .map(task => {
-      const board = boards.find(b => b.id === task.boardId)
+    .filter((task) => task.dueDate) // Only show tasks with due dates
+    .map((task) => {
+      const board = boards.find((b) => b.id === task.boardId)
       const boardColor = getBoardColor(task.boardId)
 
       return {
@@ -46,7 +47,7 @@ export function isTaskOverdue(task: Task): boolean {
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Start of today
 
-  return dueDate < today && task.status !== 'done'
+  return dueDate < today && task.status !== "done"
 }
 
 /**
@@ -79,17 +80,17 @@ export function getRelativeDateString(dateString: string): string {
   const diffTime = targetDate.getTime() - today.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Tomorrow'
-  if (diffDays === -1) return 'Yesterday'
+  if (diffDays === 0) return "Today"
+  if (diffDays === 1) return "Tomorrow"
+  if (diffDays === -1) return "Yesterday"
   if (diffDays > 1 && diffDays <= 7) return `In ${diffDays} days`
   if (diffDays < -1 && diffDays >= -7) return `${Math.abs(diffDays)} days ago`
 
   // For dates further out, return formatted date
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
   })
 }
 
@@ -97,12 +98,12 @@ export function getRelativeDateString(dateString: string): string {
  * Format date for input fields (YYYY-MM-DD)
  */
 export function formatDateForInput(dateString: string | undefined): string {
-  if (!dateString) return ''
+  if (!dateString) return ""
 
   const date = new Date(dateString)
   const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
 
   return `${year}-${month}-${day}`
 }
@@ -128,7 +129,7 @@ export function getBoardLegend(boards: Board[]): Array<{
   color: string
   colorName: string
 }> {
-  return boards.map(board => {
+  return boards.map((board) => {
     const colorInfo = getBoardColor(board.id)
     return {
       id: board.id,

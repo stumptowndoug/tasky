@@ -15,9 +15,7 @@ export function MainNav() {
         href="/"
         className={cn(
           "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-foreground",
-          pathname === "/"
-            ? "text-foreground"
-            : "text-muted-foreground"
+          pathname === "/" ? "text-foreground" : "text-muted-foreground"
         )}
       >
         <LayoutDashboard className="size-4" />
@@ -27,9 +25,7 @@ export function MainNav() {
         href="/calendar"
         className={cn(
           "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-foreground",
-          pathname === "/calendar"
-            ? "text-foreground"
-            : "text-muted-foreground"
+          pathname === "/calendar" ? "text-foreground" : "text-muted-foreground"
         )}
       >
         <Calendar className="size-4" />

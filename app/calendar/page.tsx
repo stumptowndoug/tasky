@@ -4,22 +4,26 @@ import { useEffect, useState } from "react"
 import { Calendar as CalendarIcon } from "lucide-react"
 
 import {
-  CalendarProvider,
-  CalendarDate,
-  CalendarDatePicker,
-  CalendarMonthPicker,
-  CalendarYearPicker,
-  CalendarDatePagination,
-  CalendarHeader,
+  hasUpcomingReminder,
+  isTaskOverdue,
+  tasksToCalendarFeatures,
+} from "@/lib/calendar-utils"
+import { TasksData } from "@/lib/types"
+import { cn } from "@/lib/utils"
+import {
   CalendarBody,
+  CalendarDate,
+  CalendarDatePagination,
+  CalendarDatePicker,
+  CalendarHeader,
+  CalendarMonthPicker,
+  CalendarProvider,
+  CalendarYearPicker,
   type Feature,
 } from "@/components/ui/shadcn-io/calendar"
-import { TasksData } from "@/lib/types"
-import { tasksToCalendarFeatures, isTaskOverdue, hasUpcomingReminder } from "@/lib/calendar-utils"
+import { BoardLegend } from "@/components/board-legend"
 import { HelpDialog } from "@/components/help-dialog"
 import { TaskDetailDialog } from "@/components/task-detail-dialog"
-import { BoardLegend } from "@/components/board-legend"
-import { cn } from "@/lib/utils"
 
 export default function CalendarPage() {
   const [data, setData] = useState<TasksData | null>(null)
@@ -113,7 +117,9 @@ export default function CalendarPage() {
   const currentYear = new Date().getFullYear()
 
   // Get the selected task
-  const selectedTask = selectedTaskId ? data.tasks.find(t => t.id === selectedTaskId) : null
+  const selectedTask = selectedTaskId
+    ? data.tasks.find((t) => t.id === selectedTaskId)
+    : null
 
   return (
     <section className="container py-6">
@@ -128,7 +134,8 @@ export default function CalendarPage() {
           <CalendarIcon className="mx-auto mb-4 size-12 text-muted-foreground" />
           <h3 className="mb-2 text-lg font-semibold">No tasks scheduled</h3>
           <p className="text-sm text-muted-foreground">
-            Tasks with due dates will appear on the calendar. Add a due date to a task to see it here.
+            Tasks with due dates will appear on the calendar. Add a due date to
+            a task to see it here.
           </p>
         </div>
       )}

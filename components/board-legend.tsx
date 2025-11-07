@@ -3,8 +3,8 @@
  * Displays a color-coded legend for all boards in the calendar view
  */
 
-import { Board } from "@/lib/types"
 import { getBoardLegend } from "@/lib/calendar-utils"
+import { Board } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 
 interface BoardLegendProps {

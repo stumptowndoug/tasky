@@ -35,10 +35,10 @@ export function Board({ boardId }: BoardProps) {
     }
   }
 
-  // Initial data fetch
+  // Initial data fetch and refetch when boardId changes
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [boardId])
 
   // Setup SSE connection for real-time updates
   useEffect(() => {
@@ -63,14 +63,6 @@ export function Board({ boardId }: BoardProps) {
     }
   }, [])
 
-  if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <p className="text-muted-foreground">Loading tasks...</p>
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -82,6 +74,10 @@ export function Board({ boardId }: BoardProps) {
   const board = data?.boards.find((b) => b.id === boardId)
 
   if (!board) {
+    // Don't show "Board not found" while loading
+    if (loading) {
+      return null
+    }
     return (
       <div className="flex h-64 items-center justify-center">
         <p className="text-muted-foreground">Board not found</p>

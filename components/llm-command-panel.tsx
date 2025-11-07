@@ -40,25 +40,29 @@ export function LLMCommandPanel() {
                   <Badge variant="outline" className="font-mono text-[10px]">
                     Add task
                   </Badge>
-                  <span>"Add a task to research databases"</span>
+                  <span>&quot;Add a task to research databases&quot;</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="font-mono text-[10px]">
                     Move task
                   </Badge>
-                  <span>"Move task-123 to done"</span>
+                  <span>&quot;Move task-123 to done&quot;</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="font-mono text-[10px]">
                     Update
                   </Badge>
-                  <span>"Update the database task to high priority"</span>
+                  <span>
+                    &quot;Update the database task to high priority&quot;
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="font-mono text-[10px]">
                     Organize
                   </Badge>
-                  <span>"Organize all done tasks from last week"</span>
+                  <span>
+                    &quot;Organize all done tasks from last week&quot;
+                  </span>
                 </div>
               </div>
             </div>

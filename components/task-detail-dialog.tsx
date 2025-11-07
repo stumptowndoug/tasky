@@ -1,7 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { Bell, Calendar, Check, Copy } from "lucide-react"
+
+import { getRelativeDateString, isTaskOverdue } from "@/lib/calendar-utils"
 import { Task } from "@/lib/types"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,10 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Copy, Check, Calendar, Bell } from "lucide-react"
-import { getRelativeDateString, isTaskOverdue } from "@/lib/calendar-utils"
 
 interface TaskDetailDialogProps {
   task: Task | null
@@ -20,13 +21,28 @@ interface TaskDetailDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function TaskDetailDialog({ task, open, onOpenChange }: TaskDetailDialogProps) {
+export function TaskDetailDialog({
+  task,
+  open,
+  onOpenChange,
+}: TaskDetailDialogProps) {
   const [copied, setCopied] = useState(false)
 
   if (!task) return null
 
   // Extract core fields
-  const { id, boardId, title, status, description, dueDate, reminderDate, createdAt, updatedAt, ...customFields } = task
+  const {
+    id,
+    boardId,
+    title,
+    status,
+    description,
+    dueDate,
+    reminderDate,
+    createdAt,
+    updatedAt,
+    ...customFields
+  } = task
 
   // Extract common custom fields
   const priority = customFields.priority as string | undefined
@@ -63,11 +79,7 @@ export function TaskDetailDialog({ task, open, onOpenChange }: TaskDetailDialogP
                 <Copy className="size-3" />
               )}
             </Button>
-            {priority && (
-              <Badge variant="outline">
-                {priority}
-              </Badge>
-            )}
+            {priority && <Badge variant="outline">{priority}</Badge>}
           </div>
           <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
         </DialogHeader>
@@ -98,7 +110,13 @@ export function TaskDetailDialog({ task, open, onOpenChange }: TaskDetailDialogP
                   <div className="flex items-center gap-2">
                     <Calendar className="size-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Due:</span>
-                    <span className={`text-sm ${isTaskOverdue(task) ? "font-medium text-destructive" : "text-muted-foreground"}`}>
+                    <span
+                      className={`text-sm ${
+                        isTaskOverdue(task)
+                          ? "font-medium text-destructive"
+                          : "text-muted-foreground"
+                      }`}
+                    >
                       {getRelativeDateString(dueDate)}
                     </span>
                     <span className="text-xs text-muted-foreground">
