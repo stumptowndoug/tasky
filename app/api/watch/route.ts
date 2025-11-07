@@ -2,7 +2,10 @@ import { NextRequest } from "next/server"
 import { watch } from "fs"
 import path from "path"
 
-const TASKS_FILE_PATH = path.join(process.cwd(), "data", "tasks.json")
+// Get tasks file path from environment variable or use default
+const TASKS_FILE_PATH = process.env.TASKS_FILE_PATH
+  ? path.join(process.cwd(), process.env.TASKS_FILE_PATH)
+  : path.join(process.cwd(), "data", "tasks.json")
 
 /**
  * GET /api/watch

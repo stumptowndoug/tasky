@@ -17,7 +17,11 @@ import type {
   UpdateBoardRequest,
 } from "./types"
 
-const TASKS_FILE_PATH = path.join(process.cwd(), "data", "tasks.json")
+// Get tasks file path from environment variable or use default
+// This allows you to use a different file for personal tasks
+const TASKS_FILE_PATH = process.env.TASKS_FILE_PATH
+  ? path.join(process.cwd(), process.env.TASKS_FILE_PATH)
+  : path.join(process.cwd(), "data", "tasks.json")
 
 /**
  * Read tasks data from file

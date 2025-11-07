@@ -271,17 +271,40 @@ Tasky uses npm workspaces to manage both the web app and MCP server in one repo.
 
 ## Managing Your Tasks
 
+Tasky supports both individual and team use through flexible configuration.
+
 ### Individual Use (Keep Tasks Private)
 
-If you want to use Tasky for your personal tasks without sharing them:
+**Option 1: Environment Variable (Recommended)**
 
-1. Add `data/tasks.json` to `.gitignore`:
-   ```bash
-   echo "data/tasks.json" >> .gitignore
-   ```
+Use a separate file for your personal tasks:
 
-2. Your tasks will stay on your machine only
-3. The repo comes with example data that others will see when they clone
+```bash
+# 1. Copy the environment template
+cp .env.example .env.local
+
+# 2. Edit .env.local and uncomment/set:
+TASKS_FILE_PATH=data/my-tasks.json
+
+# 3. Copy the example data to your personal file
+cp data/tasks.json data/my-tasks.json
+
+# 4. Add your file to .gitignore
+echo "data/my-tasks.json" >> .gitignore
+```
+
+Now `data/tasks.json` stays as example data in git, and `data/my-tasks.json` contains your personal tasks (never committed). `.env.local` is already in `.gitignore` so your settings won't be committed.
+
+**Option 2: Gitignore the Default File**
+
+Simpler but less flexible:
+
+```bash
+# Add tasks.json to .gitignore
+echo "data/tasks.json" >> .gitignore
+```
+
+Your tasks stay on your machine only, but new users won't see example data.
 
 ### Team Use (Share Tasks via Git)
 
@@ -301,7 +324,7 @@ Everyone on your team will see the same tasks when they pull.
 
 ### Manual Backup/Transfer
 
-You can also copy `data/tasks.json` to:
+You can also copy your tasks file (default: `data/tasks.json`) to:
 - Backup your tasks
 - Move between machines
 - Share with specific people

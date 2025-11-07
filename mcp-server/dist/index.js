@@ -5,6 +5,9 @@
  * Model Context Protocol server for managing tasks in Tasky.
  * Works with Claude Desktop, Cursor, and other MCP-compatible tools.
  */
+// Load environment variables from .env.local or .env
+import { config } from "dotenv";
+config({ path: [".env.local", ".env"] });
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
@@ -14,8 +17,11 @@ import { fileURLToPath } from "url";
 // Get the directory of this file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// Path to tasks.json (relative to this file: mcp-server/dist/index.js -> ../../data/tasks.json)
-const TASKS_FILE = join(__dirname, "../../data/tasks.json");
+// Path to tasks.json - supports custom path via environment variable
+// Default: mcp-server/dist/index.js -> ../../data/tasks.json
+const TASKS_FILE = process.env.TASKS_FILE_PATH
+    ? join(__dirname, "../..", process.env.TASKS_FILE_PATH)
+    : join(__dirname, "../../data/tasks.json");
 /**
  * Read tasks data from file
  */
@@ -31,6 +37,54 @@ async function writeTasksData(data) {
     const tempFile = TASKS_FILE + ".tmp";
     await writeFile(tempFile, JSON.stringify(data, null, 2), "utf-8");
     await writeFile(TASKS_FILE, JSON.stringify(data, null, 2), "utf-8");
+}
+/**
+ * Validate that a board exists
+ * Returns error object if board doesn't exist, null if valid
+ */
+function validateBoardExists(data, boardId) {
+    const boardExists = data.boards.some((b) => b.id === boardId);
+    if (!boardExists) {
+        const availableBoards = data.boards.map((b) => `"${b.id}" (${b.name})`).join(", ");
+        return {
+            error: `Board "${boardId}" does not exist. Available boards: ${availableBoards}`,
+        };
+    }
+    return null;
+}
+/**
+ * Validate that a column exists in a board
+ * Returns error object if column doesn't exist, null if valid
+ */
+function validateColumnExists(data, boardId, columnId) {
+    const board = data.boards.find((b) => b.id === boardId);
+    if (!board) {
+        return {
+            error: `Board "${boardId}" not found.`,
+        };
+    }
+    const columnExists = board.columns.some((c) => c.id === columnId);
+    if (!columnExists) {
+        const availableColumns = board.columns.map((c) => `"${c.id}" (${c.name})`).join(", ");
+        return {
+            error: `Column "${columnId}" does not exist in board "${board.name}". Available columns: ${availableColumns}`,
+        };
+    }
+    return null;
+}
+/**
+ * Format boards and columns info for context
+ * Returns a formatted string showing all available boards and their columns
+ */
+function formatBoardsContext(data) {
+    const boardsInfo = data.boards.map((b) => {
+        const columns = b.columns
+            .sort((a, b) => a.order - b.order)
+            .map((c) => c.id)
+            .join(", ");
+        return `- "${b.id}" (${b.name}): ${columns}`;
+    }).join("\n");
+    return `\n\nAvailable boards and columns:\n${boardsInfo}`;
 }
 /**
  * Generate sequential task ID
@@ -373,18 +427,46 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: JSON.stringify(tasks, null, 2),
+                            text: `${JSON.stringify(tasks, null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "add_task": {
                 const data = await readTasksData();
+                const boardId = String(args.boardId || "default");
+                // Validate board exists
+                const boardValidationError = validateBoardExists(data, boardId);
+                if (boardValidationError) {
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: boardValidationError.error,
+                            },
+                        ],
+                        isError: true,
+                    };
+                }
+                const status = String(args.status || "todo");
+                // Validate column exists
+                const columnValidationError = validateColumnExists(data, boardId, status);
+                if (columnValidationError) {
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: columnValidationError.error,
+                            },
+                        ],
+                        isError: true,
+                    };
+                }
                 const newTask = {
                     id: generateTaskId(data.tasks),
-                    boardId: args.boardId || "default",
+                    boardId: boardId,
                     title: args.title,
-                    status: args.status || "todo",
+                    status: status,
                     description: args.description || "",
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
@@ -402,7 +484,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Task created successfully!\n\n${JSON.stringify(newTask, null, 2)}`,
+                            text: `Task created successfully!\n\n${JSON.stringify(newTask, null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
@@ -420,6 +502,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         ],
                         isError: true,
                     };
+                }
+                // Validate column if status is being updated
+                if (args.status !== undefined) {
+                    const taskBoardId = data.tasks[taskIndex].boardId || "default";
+                    const columnValidationError = validateColumnExists(data, taskBoardId, String(args.status));
+                    if (columnValidationError) {
+                        return {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: columnValidationError.error,
+                                },
+                            ],
+                            isError: true,
+                        };
+                    }
                 }
                 const updates = {
                     updatedAt: new Date().toISOString(),
@@ -446,7 +544,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Task updated successfully!\n\n${JSON.stringify(data.tasks[taskIndex], null, 2)}`,
+                            text: `Task updated successfully!\n\n${JSON.stringify(data.tasks[taskIndex], null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
@@ -472,7 +570,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Task deleted successfully!\n\nDeleted task: ${deletedTask.title}`,
+                            text: `Task deleted successfully!\n\nDeleted task: ${deletedTask.title}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
@@ -491,6 +589,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         isError: true,
                     };
                 }
+                // Validate column exists in task's board
+                const taskBoardId = data.tasks[taskIndex].boardId || "default";
+                const columnValidationError = validateColumnExists(data, taskBoardId, String(args.status));
+                if (columnValidationError) {
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: columnValidationError.error,
+                            },
+                        ],
+                        isError: true,
+                    };
+                }
                 data.tasks[taskIndex].status = args.status;
                 data.tasks[taskIndex].updatedAt = new Date().toISOString();
                 await writeTasksData(data);
@@ -498,7 +610,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Task moved successfully!\n\n${data.tasks[taskIndex].title} → ${args.status}`,
+                            text: `Task moved successfully!\n\n${data.tasks[taskIndex].title} → ${args.status}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
@@ -530,26 +642,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Found ${results.length} task(s):\n\n${JSON.stringify(results, null, 2)}`,
+                            text: `Found ${results.length} task(s):\n\n${JSON.stringify(results, null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "add_column": {
                 const data = await readTasksData();
-                const boardId = args.boardId || "default";
-                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
-                if (boardIndex === -1) {
+                const boardId = String(args.boardId || "default");
+                // Validate board exists
+                const validationError = validateBoardExists(data, boardId);
+                if (validationError) {
                     return {
                         content: [
                             {
                                 type: "text",
-                                text: `Error: Board with ID "${boardId}" not found.`,
+                                text: validationError.error,
                             },
                         ],
                         isError: true,
                     };
                 }
+                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
                 // Check if column ID already exists
                 const existingColumn = data.boards[boardIndex].columns.find((c) => c.id === args.columnId);
                 if (existingColumn) {
@@ -576,26 +690,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Column added successfully!\n\n${JSON.stringify(newColumn, null, 2)}`,
+                            text: `Column added successfully!\n\n${JSON.stringify(newColumn, null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "update_column": {
                 const data = await readTasksData();
-                const boardId = args.boardId || "default";
-                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
-                if (boardIndex === -1) {
+                const boardId = String(args.boardId || "default");
+                // Validate board exists
+                const validationError = validateBoardExists(data, boardId);
+                if (validationError) {
                     return {
                         content: [
                             {
                                 type: "text",
-                                text: `Error: Board with ID "${boardId}" not found.`,
+                                text: validationError.error,
                             },
                         ],
                         isError: true,
                     };
                 }
+                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
                 const columnIndex = data.boards[boardIndex].columns.findIndex((c) => c.id === args.columnId);
                 if (columnIndex === -1) {
                     return {
@@ -621,26 +737,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Column updated successfully!\n\n${JSON.stringify(data.boards[boardIndex].columns[columnIndex], null, 2)}`,
+                            text: `Column updated successfully!\n\n${JSON.stringify(data.boards[boardIndex].columns[columnIndex], null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "delete_column": {
                 const data = await readTasksData();
-                const boardId = args.boardId || "default";
-                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
-                if (boardIndex === -1) {
+                const boardId = String(args.boardId || "default");
+                // Validate board exists
+                const validationError = validateBoardExists(data, boardId);
+                if (validationError) {
                     return {
                         content: [
                             {
                                 type: "text",
-                                text: `Error: Board with ID "${boardId}" not found.`,
+                                text: validationError.error,
                             },
                         ],
                         isError: true,
                     };
                 }
+                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
                 const columnIndex = data.boards[boardIndex].columns.findIndex((c) => c.id === args.columnId);
                 if (columnIndex === -1) {
                     return {
@@ -660,33 +778,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Column deleted successfully!\n\nDeleted: ${deletedColumn.name} (${deletedColumn.id})`,
+                            text: `Column deleted successfully!\n\nDeleted: ${deletedColumn.name} (${deletedColumn.id})${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "update_board": {
                 const data = await readTasksData();
-                const boardId = args.boardId || "default";
-                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
-                if (boardIndex === -1) {
+                const boardId = String(args.boardId || "default");
+                // Validate board exists
+                const validationError = validateBoardExists(data, boardId);
+                if (validationError) {
                     return {
                         content: [
                             {
                                 type: "text",
-                                text: `Error: Board with ID "${boardId}" not found.`,
+                                text: validationError.error,
                             },
                         ],
                         isError: true,
                     };
                 }
+                const boardIndex = data.boards.findIndex((b) => b.id === boardId);
                 data.boards[boardIndex].name = args.name;
                 await writeTasksData(data);
                 return {
                     content: [
                         {
                             type: "text",
-                            text: `Board updated successfully!\n\n${JSON.stringify(data.boards[boardIndex], null, 2)}`,
+                            text: `Board updated successfully!\n\n${JSON.stringify(data.boards[boardIndex], null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
@@ -733,25 +853,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Board created successfully!\n\n${JSON.stringify(newBoard, null, 2)}`,
+                            text: `Board created successfully!\n\n${JSON.stringify(newBoard, null, 2)}${formatBoardsContext(data)}`,
                         },
                     ],
                 };
             }
             case "delete_board": {
                 const data = await readTasksData();
-                const boardIndex = data.boards.findIndex((b) => b.id === args.boardId);
-                if (boardIndex === -1) {
+                // Validate board exists
+                const validationError = validateBoardExists(data, String(args.boardId));
+                if (validationError) {
                     return {
                         content: [
                             {
                                 type: "text",
-                                text: `Error: Board with ID "${args.boardId}" not found.`,
+                                text: validationError.error,
                             },
                         ],
                         isError: true,
                     };
                 }
+                const boardIndex = data.boards.findIndex((b) => b.id === args.boardId);
                 // Prevent deleting the default board if it's the only one
                 if (data.boards.length === 1) {
                     return {
@@ -776,7 +898,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: `Board deleted successfully!\n\nDeleted: ${deletedBoard.name} (${deletedBoard.id})\nTasks deleted: ${tasksDeletedCount}`,
+                            text: `Board deleted successfully!\n\nDeleted: ${deletedBoard.name} (${deletedBoard.id})\nTasks deleted: ${tasksDeletedCount}${formatBoardsContext(data)}`,
                         },
                     ],
                 };

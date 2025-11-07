@@ -7,7 +7,7 @@
         {
           "id": "todo",
           "name": "To Do",
-          "order": 0
+          "order": 1
         },
         {
           "id": "in-progress",
