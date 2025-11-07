@@ -51,7 +51,7 @@
     --popover: 0 0% 14.9%; /* neutral-800 - elevated */
     --popover-foreground: 0 0% 98%; /* neutral-50 */
 
-    --border: 0 0% 14.9%; /* neutral-800 */
+    --border: 0 0% 26.1%; /* neutral-700 - lighter than card for visibility */
     --input: 0 0% 14.9%; /* neutral-800 */
 
     --card: 0 0% 14.9%; /* neutral-800 - elevated above background */
