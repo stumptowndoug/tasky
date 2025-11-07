@@ -71,24 +71,22 @@
       ]
     },
     {
-      "id": "task-1762473040234-mqzeh3aiv",
+      "id": "task-5",
       "boardId": "default",
-      "title": "Create front end chat integration",
+      "title": "Chase's Birthday - November 8th at 2:30 PM PST",
       "status": "todo",
-      "description": "Add a chat interface to the front end to allow users to change and manage tasks through natural language conversation.",
-      "createdAt": "2025-11-06T23:50:40.234Z",
-      "updatedAt": "2025-11-06T23:50:40.234Z",
-      "priority": "medium",
+      "description": "Reminder for Chase's birthday celebration!\n\nTo-do before the party:\n- Pick up the birthday cake\n- Get balloons\n- Purchase game cards\n\nTime: 2:30 PM PST on November 8th",
+      "createdAt": "2025-11-07T00:41:16.417Z",
+      "updatedAt": "2025-11-07T00:41:16.419Z",
+      "priority": "high",
       "tags": [
-        "feature",
-        "frontend",
-        "chat",
-        "ui"
+        "birthday",
+        "reminder"
       ]
     }
   ],
   "metadata": {
     "version": "1.0",
-    "lastModified": "2025-11-06T23:50:40.234Z"
+    "lastModified": "2025-11-07T00:41:16.419Z"
   }
 }
