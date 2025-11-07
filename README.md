@@ -70,7 +70,11 @@ npm run setup
 
 **You'll know it worked when**: You see messages like "Setup complete!" with no errors.
 
-### Step 3: Start the App
+### Step 3: Restart Your AI Coding Assistant
+
+After setup completes, close and reopen your AI coding assistant (Claude Code, Cursor, etc.). This allows it to detect and load the MCP tools.
+
+### Step 4: Start the App
 
 ```bash
 npm run dev
