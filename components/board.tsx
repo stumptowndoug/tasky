@@ -97,7 +97,7 @@ export function Board({ boardId }: BoardProps) {
   const sortedColumns = [...board.columns].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="flex min-h-[600px] gap-4 overflow-x-auto px-1 pb-4">
+    <div className="flex min-h-[600px] gap-4 overflow-x-auto pb-4">
       {sortedColumns.map((column) => {
         const columnTasks = boardTasks.filter(
           (task) => task.status === column.id

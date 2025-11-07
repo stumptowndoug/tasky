@@ -117,14 +117,6 @@ export default function CalendarPage() {
 
   return (
     <section className="container py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <CalendarIcon className="size-6" />
-          <h1 className="text-2xl font-bold">Calendar View</h1>
-        </div>
-        <HelpDialog />
-      </div>
-
       {/* Board Legend */}
       <div className="mb-6">
         <BoardLegend boards={data.boards} />
@@ -158,6 +150,7 @@ export default function CalendarPage() {
 
             return (
               <div
+                key={task.id}
                 className={cn(
                   "flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 transition-colors hover:bg-accent",
                   isTaskOverdue(task) && "text-destructive",
