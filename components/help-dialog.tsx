@@ -81,7 +81,7 @@ export function HelpDialog() {
             </div>
           </div>
 
-          <div className="pt-2 border-t space-y-1.5 text-xs text-muted-foreground">
+          <div className="pt-4 mt-2 space-y-1.5 text-xs text-muted-foreground relative before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/20 before:to-transparent">
             <p>
               <strong>Using Claude Code:</strong> Simply ask me to manage your
               tasks
@@ -98,7 +98,7 @@ export function HelpDialog() {
             </p>
           </div>
 
-          <div className="pt-2 border-t">
+          <div className="pt-4 mt-2 relative before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/20 before:to-transparent">
             <p className="text-xs text-muted-foreground">
               📖 See{" "}
               <code className="bg-muted px-1 py-0.5 rounded">
