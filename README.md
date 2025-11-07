@@ -2,11 +2,11 @@
 
 **A friendly project to learn how AI coding assistants work**
 
-Tasky is a simple task manager (like a to-do list) that you manage entirely through AI assistants like Claude. It's designed to help you learn how modern AI coding tools work, especially working with MCPs (Model Context Protocol).
+Tasky is a simple task manager (like a to-do list) that you manage entirely through AI coding assistants. It's designed to help you learn how modern AI coding tools work, especially working with MCPs (Model Context Protocol).
 
 ## Why Tasky?
 
-Instead of clicking buttons to add tasks, you'll tell an AI assistant like Claude Code to do it for you. This teaches you:
+Instead of clicking buttons to add tasks, you'll tell an AI coding assistant to do it for you. This teaches you:
 
 - How to work with AI coding assistants
 - What MCPs are and why they're useful
@@ -32,19 +32,19 @@ node --version
 **If you see a version number** (like `v20.x.x`), you're good!
 **If you get an error**: Download and install from [nodejs.org](https://nodejs.org/) - choose the "LTS" version (recommended for most users)
 
-### 2. An AI Coding Assistant
+### 2. An AI Coding Assistant with MCP Support
 
-You need an ai coding assistant. Here are some examples:
+You need an AI coding assistant that supports MCP (Model Context Protocol). Popular options include:
 
-- **Claude Code** (Recommended for beginners) - [Get it here](https://claude.ai/claude-code)
+- **Claude Code** - [Get it here](https://claude.ai/claude-code)
 - **Cursor** - [cursor.com](https://cursor.com)
-- **Codex CLI** - [openai.com/codex/](https://github.com/openai/codex)
-- **OpenCode** - [opencode.ai/](https://github.com/sst/opencode)
+- **Codex CLI** - [github.com/openai/codex](https://github.com/openai/codex)
+- **OpenCode** - [github.com/sst/opencode](https://github.com/sst/opencode)
 
-### 3. A Code Editor (Or Cursor)
+### 3. A Code Editor (Optional)
 
 - **VS Code** - [code.visualstudio.com](https://code.visualstudio.com/) (Free and beginner-friendly)
-- Or use the editor built into Claude Code/Cursor
+- Or use the editor built into your AI coding assistant (Cursor, Claude Code, etc.)
 
 ---
 
@@ -54,18 +54,9 @@ You need an ai coding assistant. Here are some examples:
 
 **Option A: Using Git (recommended)**
 ```bash
-git clone https://github.com/YOUR_USERNAME/tasky.git
+git clone https://github.com/stumptowndoug/tasky.git
 cd tasky
 ```
-
-**Option B: Download as ZIP**
-1. Click the green "Code" button on GitHub
-2. Select "Download ZIP"
-3. Unzip the file
-4. Open Terminal and navigate to the folder:
-   ```bash
-   cd path/to/tasky
-   ```
 
 ### Step 2: Install Everything
 
@@ -102,11 +93,11 @@ You should see a beautiful kanban board with some example tasks!
 
 ### The Big Idea
 
-**You don't click buttons** to add or move tasks. Instead, you ai assistants what you want, and it does it for you!
+**You don't click buttons** to add or move tasks. Instead, you tell your AI assistant what you want, and it does it for you!
 
 ### Basic Examples
 
-Open Claude Code in the tasky folder and try these:
+Open your AI coding assistant in the tasky folder and try these:
 
 1. **Add a task**
    ```
@@ -128,11 +119,11 @@ Open Claude Code in the tasky folder and try these:
    "Add a high-priority task to research AI coding tools"
    ```
 
-**Watch the board update in your browser** as Claude makes changes! It happens instantly.
+**Watch the board update in your browser** as the AI makes changes! It happens instantly.
 
 ---
 
-## Understanding MCPs (The Cool Part!)
+## Understanding MCPs
 
 ### What is MCP?
 
@@ -144,10 +135,10 @@ Open Claude Code in the tasky folder and try these:
 
 ### How Tasky Uses MCP
 
-When you tell Claude to "add a task," here's what happens:
+When you tell your AI assistant to "add a task," here's what happens:
 
-1. Claude understands what you want
-2. Claude uses Tasky's MCP tools (like `add_task`)
+1. The AI understands what you want
+2. The AI uses Tasky's MCP tools (like `add_task`)
 3. The task gets added to your data
 4. The board updates automatically
 
@@ -155,7 +146,7 @@ When you tell Claude to "add a task," here's what happens:
 
 ### What MCP Tools Does Tasky Have?
 
-Tasky gives Claude these "powers":
+Tasky provides these MCP tools to your AI assistant:
 
 - `add_task` - Create new tasks
 - `update_task` - Edit existing tasks
@@ -166,7 +157,7 @@ Tasky gives Claude these "powers":
 - `add_board` - Create new boards
 - `add_column` - Add new columns to boards
 
-**Try asking Claude**: "What MCP tools do you have available for Tasky?"
+**Try asking your AI**: "What MCP tools do you have available for Tasky?"
 
 ---
 
@@ -176,10 +167,10 @@ Tasky gives Claude these "powers":
 
 Now that it's working, try:
 
-1. **Add your own tasks**: Tell Claude about things you actually need to do
+1. **Add your own tasks**: Tell your AI assistant about things you actually need to do
 2. **Create a new board**: "Create a board called 'Learning Projects'"
 3. **Search your tasks**: "Search for all tasks about learning"
-4. **Get creative**: See what Claude can do when you ask it to organize your tasks
+4. **Get creative**: See what your AI can do when you ask it to organize your tasks
 
 ### Look at the Code
 
@@ -187,15 +178,15 @@ Want to see how it works? Open these files in your code editor:
 
 - `data/tasks.json` - Your tasks are stored here as simple text
 - `components/board.tsx` - The visual board you see in the browser
-- `mcp-server/src/index.ts` - The MCP tools Claude uses
+- `mcp-server/src/index.ts` - The MCP tools your AI assistant uses
 
 **Don't worry if you don't understand everything** - just exploring helps you learn!
 
 ### Learn More About MCPs
 
-- Ask Claude: "Explain how MCPs work in simple terms"
+- Ask your AI: "Explain how MCPs work in simple terms"
 - Read: [docs/MCP_SETUP.md](docs/MCP_SETUP.md) for more advanced setup
-- Experiment: Try building your own MCP tools (Claude can help!)
+- Experiment: Try building your own MCP tools (your AI can help!)
 
 ---
 
@@ -215,15 +206,16 @@ Want to see how it works? Open these files in your code editor:
 - Make sure `npm run dev` is still running in your Terminal
 - Refresh your browser (Cmd+R on Mac, Ctrl+R on Windows)
 
-### Claude says it can't find MCP tools
-- Make sure you're in the tasky folder when you open Claude Code
-- Try closing and reopening Claude Code
+### AI assistant can't find MCP tools
+- Make sure you're in the tasky folder when you open your AI coding assistant
+- Try closing and reopening your AI assistant
+- Check that your assistant supports MCP and is configured correctly
 
 ---
 
 ## Tips for Learning
 
-1. **Ask Claude to explain things**: "Explain what just happened when you added that task"
+1. **Ask your AI to explain things**: "Explain what just happened when you added that task"
 2. **Look at the changes**: Open `data/tasks.json` to see how your tasks are stored
 3. **Experiment**: Try breaking things! It's just practice data, you can always reset
 4. **Take it slow**: You don't need to understand everything at once
@@ -243,7 +235,7 @@ Once you're comfortable with Tasky, you can:
 
 ## Get Help
 
-- **Ask Claude**: Seriously! Claude Code can help you understand any part of this project
+- **Ask your AI assistant**: Your AI coding assistant can help you understand any part of this project
 - **Check the docs**: [docs/LLM_GUIDE.md](docs/LLM_GUIDE.md) has more details
 - **GitHub Issues**: Report bugs or ask questions on the project's GitHub page
 
@@ -251,6 +243,6 @@ Once you're comfortable with Tasky, you can:
 
 ## Remember
 
-**You're learning by doing!** Every time you ask Claude to do something with Tasky, you're learning how modern AI-powered development works. Don't be afraid to experiment and make mistakes - that's how you learn.
+**You're learning by doing!** Every time you ask your AI assistant to do something with Tasky, you're learning how modern AI-powered development works. Don't be afraid to experiment and make mistakes - that's how you learn.
 
 **Have fun building!** 🚀
