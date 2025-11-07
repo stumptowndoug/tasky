@@ -1,6 +1,7 @@
 "use client"
 
-import { Task, Column as ColumnType } from "@/lib/types"
+import { Column as ColumnType, Task } from "@/lib/types"
+
 import { TaskCard } from "./task-card"
 
 interface ColumnProps {
@@ -26,10 +27,7 @@ export function Column({ column, tasks }: ColumnProps) {
       {/* Task List */}
       <div className="flex-1 space-y-3 overflow-y-auto pb-4">
         {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-          />
+          <TaskCard key={task.id} task={task} />
         ))}
 
         {tasks.length === 0 && (

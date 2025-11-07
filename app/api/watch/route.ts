@@ -1,8 +1,11 @@
-import { NextRequest } from "next/server"
 import { watch } from "fs"
 import path from "path"
+import { NextRequest } from "next/server"
 
-const TASKS_FILE_PATH = path.join(process.cwd(), "data", "tasks.json")
+// Get tasks file path from environment variable or use default
+const TASKS_FILE_PATH = process.env.TASKS_FILE_PATH
+  ? path.join(process.cwd(), process.env.TASKS_FILE_PATH)
+  : path.join(process.cwd(), "data", "tasks.json")
 
 /**
  * GET /api/watch
@@ -40,9 +43,7 @@ export async function GET(request: NextRequest) {
       const heartbeat = setInterval(() => {
         try {
           controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({ type: "heartbeat" })}\n\n`
-            )
+            encoder.encode(`data: ${JSON.stringify({ type: "heartbeat" })}\n\n`)
           )
         } catch (error) {
           clearInterval(heartbeat)

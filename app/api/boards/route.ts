@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getBoards, createBoard } from "@/lib/tasks"
-import type { CreateBoardRequest, ApiResponse } from "@/lib/types"
+
+import { createBoard, getBoards } from "@/lib/tasks"
+import type { ApiResponse, CreateBoardRequest } from "@/lib/types"
 
 /**
  * GET /api/boards

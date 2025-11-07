@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
 import { Board as BoardType, Task, TasksData } from "@/lib/types"
+
 import { Column } from "./column"
 
 interface BoardProps {
@@ -88,7 +90,8 @@ export function Board({ boardId }: BoardProps) {
   }
 
   // Get tasks for this board and sort them by column
-  const boardTasks = data?.tasks.filter((task) => task.boardId === boardId) || []
+  const boardTasks =
+    data?.tasks.filter((task) => task.boardId === boardId) || []
 
   // Sort columns by order
   const sortedColumns = [...board.columns].sort((a, b) => a.order - b.order)
@@ -96,14 +99,10 @@ export function Board({ boardId }: BoardProps) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 px-1 min-h-[600px]">
       {sortedColumns.map((column) => {
-        const columnTasks = boardTasks.filter((task) => task.status === column.id)
-        return (
-          <Column
-            key={column.id}
-            column={column}
-            tasks={columnTasks}
-          />
+        const columnTasks = boardTasks.filter(
+          (task) => task.status === column.id
         )
+        return <Column key={column.id} column={column} tasks={columnTasks} />
       })}
     </div>
   )

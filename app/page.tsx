@@ -1,10 +1,12 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
+
 import { Board } from "@/components/board"
 import { HelpDialog } from "@/components/help-dialog"
 
-export default function IndexPage() {
+function IndexPageContent() {
   const searchParams = useSearchParams()
   const boardId = searchParams.get("board") || "default"
 
@@ -16,5 +18,13 @@ export default function IndexPage() {
 
       <Board boardId={boardId} />
     </section>
+  )
+}
+
+export default function IndexPage() {
+  return (
+    <Suspense fallback={<div className="container py-6">Loading...</div>}>
+      <IndexPageContent />
+    </Suspense>
   )
 }

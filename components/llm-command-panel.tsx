@@ -1,8 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { FileJson, Sparkles, Terminal } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function LLMCommandPanel() {
   return (
@@ -15,7 +16,8 @@ export function LLMCommandPanel() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          This board is <strong>read-only</strong>. Manage your tasks using AI assistants like Claude Code or Cursor.
+          This board is <strong>read-only</strong>. Manage your tasks using AI
+          assistants like Claude Code or Cursor.
         </p>
 
         <div className="space-y-3">
@@ -23,7 +25,9 @@ export function LLMCommandPanel() {
             <FileJson className="h-4 w-4 mt-0.5 text-primary shrink-0" />
             <div>
               <p className="font-medium">Data Location</p>
-              <code className="text-xs bg-muted px-1.5 py-0.5 rounded">data/tasks.json</code>
+              <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
+                data/tasks.json
+              </code>
             </div>
           </div>
 
@@ -63,19 +67,28 @@ export function LLMCommandPanel() {
 
         <div className="pt-2 border-t space-y-1.5 text-xs text-muted-foreground">
           <p>
-            <strong>Using Claude Code:</strong> Simply ask me to manage your tasks
+            <strong>Using Claude Code:</strong> Simply ask me to manage your
+            tasks
           </p>
           <p>
             <strong>Using Cursor:</strong> Ask Cursor AI in the chat panel
           </p>
           <p>
-            <strong>Manual Edit:</strong> Open <code className="bg-muted px-1 py-0.5 rounded">data/tasks.json</code> in your editor
+            <strong>Manual Edit:</strong> Open{" "}
+            <code className="bg-muted px-1 py-0.5 rounded">
+              data/tasks.json
+            </code>{" "}
+            in your editor
           </p>
         </div>
 
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
-            📖 See <code className="bg-muted px-1 py-0.5 rounded">docs/LLM_GUIDE.md</code> for detailed instructions
+            📖 See{" "}
+            <code className="bg-muted px-1 py-0.5 rounded">
+              docs/LLM_GUIDE.md
+            </code>{" "}
+            for detailed instructions
           </p>
         </div>
       </CardContent>

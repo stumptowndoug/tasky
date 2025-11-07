@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getTaskById, updateTask, deleteTask } from "@/lib/tasks"
-import type { UpdateTaskRequest, ApiResponse } from "@/lib/types"
+
+import { deleteTask, getTaskById, updateTask } from "@/lib/tasks"
+import type { ApiResponse, UpdateTaskRequest } from "@/lib/types"
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 /**
  * GET /api/tasks/[id]
  * Returns a single task by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
-    const task = await getTaskById(params.id)
+    const { id } = await params
+    const task = await getTaskById(id)
 
     if (!task) {
       return NextResponse.json<ApiResponse>(
@@ -48,13 +47,11 @@ export async function GET(
  * PUT /api/tasks/[id]
  * Updates a task
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function PUT(request: NextRequest, { params }: RouteContext) {
   try {
+    const { id } = await params
     const body: Partial<UpdateTaskRequest> = await request.json()
-    const updatedTask = await updateTask(params.id, body)
+    const updatedTask = await updateTask(id, body)
 
     if (!updatedTask) {
       return NextResponse.json<ApiResponse>(
@@ -85,12 +82,10 @@ export async function PUT(
  * DELETE /api/tasks/[id]
  * Deletes a task
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteContext
-) {
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
   try {
-    const success = await deleteTask(params.id)
+    const { id } = await params
+    const success = await deleteTask(id)
 
     if (!success) {
       return NextResponse.json<ApiResponse>(
@@ -104,7 +99,7 @@ export async function DELETE(
 
     return NextResponse.json<ApiResponse>({
       success: true,
-      data: { id: params.id },
+      data: { id },
     })
   } catch (error) {
     return NextResponse.json<ApiResponse>(

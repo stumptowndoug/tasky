@@ -1,6 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { FileJson, HelpCircle, Sparkles, Terminal } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,9 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { FileJson, Sparkles, Terminal, HelpCircle } from "lucide-react"
 
 export function HelpDialog() {
   const [open, setOpen] = useState(false)

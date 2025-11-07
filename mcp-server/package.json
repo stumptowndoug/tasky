@@ -12,11 +12,17 @@
     "watch": "tsc --watch",
     "start": "node dist/index.js"
   },
-  "keywords": ["mcp", "tasks", "ai", "llm"],
+  "keywords": [
+    "mcp",
+    "tasks",
+    "ai",
+    "llm"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4"
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

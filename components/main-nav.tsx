@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 
@@ -19,8 +19,7 @@ export function MainNav() {
   const searchParams = useSearchParams()
   const currentBoardId = searchParams.get("board") || "default"
 
-  useEffect(() => {
-    // Fetch boards from API
+  const fetchBoards = () => {
     fetch("/api/tasks")
       .then((res) => res.json())
       .then((response) => {
@@ -29,6 +28,34 @@ export function MainNav() {
         }
       })
       .catch((error) => console.error("Failed to fetch boards:", error))
+  }
+
+  // Initial fetch
+  useEffect(() => {
+    fetchBoards()
+  }, [])
+
+  // Setup SSE connection for real-time updates
+  useEffect(() => {
+    const eventSource = new EventSource("/api/watch")
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+
+      if (data.type === "file-changed") {
+        // File changed, refetch boards
+        fetchBoards()
+      }
+    }
+
+    eventSource.onerror = () => {
+      console.error("SSE connection error in MainNav")
+      eventSource.close()
+    }
+
+    return () => {
+      eventSource.close()
+    }
   }, [])
 
   return (

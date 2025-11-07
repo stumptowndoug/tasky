@@ -1,4 +1,4 @@
-.PHONY: help install dev build mcp-build mcp-watch clean
+.PHONY: help install dev build lint lint-fix format typecheck mcp-build mcp-watch clean
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -17,6 +17,18 @@ dev: ## Start the development server and open browser
 
 build: ## Build the Next.js app for production
 	npm run build
+
+lint: ## Run ESLint to check for code issues
+	npm run lint
+
+lint-fix: ## Run ESLint and automatically fix issues
+	npm run lint:fix
+
+format: ## Format code with Prettier
+	npm run format:write
+
+typecheck: ## Run TypeScript type checking
+	npm run typecheck
 
 mcp-build: ## Build the MCP server
 	npm run mcp:build
