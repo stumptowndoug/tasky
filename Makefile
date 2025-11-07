@@ -12,8 +12,8 @@ install: ## Install all dependencies (one-time setup)
 	@echo ''
 	@echo '✅ Setup complete! Run "make dev" to start the app.'
 
-dev: ## Start the development server
-	npm run dev
+dev: ## Start the development server and open browser
+	npm run dev:open
 
 build: ## Build the Next.js app for production
 	npm run build

@@ -14,10 +14,15 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-// Path to tasks.json (relative to project root)
-const TASKS_FILE = join(process.cwd(), "../data/tasks.json");
+// Get the directory of this file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Path to tasks.json (relative to this file: mcp-server/dist/index.js -> ../../data/tasks.json)
+const TASKS_FILE = join(__dirname, "../../data/tasks.json");
 
 /**
  * Read tasks data from file

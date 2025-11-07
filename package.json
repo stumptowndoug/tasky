@@ -6,12 +6,13 @@
     "mcp-server"
   ],
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3737",
+    "dev:open": "next dev -p 3737 & sleep 2 && open http://localhost:3737",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3737",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "preview": "next build && next start",
+    "preview": "next build && next start -p 3737",
     "typecheck": "tsc --noEmit",
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",

@@ -24,8 +24,7 @@ Tasky is designed for seamless collaboration between humans and AI agents. Tasks
 
 ```bash
 make install    # One-time setup (installs everything)
-make dev        # Start the development server
-# Open http://localhost:3000
+make dev        # Start the development server (opens http://localhost:3737)
 ```
 
 ### Option 2: Using npm
@@ -33,7 +32,7 @@ make dev        # Start the development server
 ```bash
 npm run setup   # One-time setup (installs everything)
 npm run dev     # Start the development server
-# Open http://localhost:3000
+# Open http://localhost:3737
 ```
 
 ### MCP Server (Auto-configured!)
