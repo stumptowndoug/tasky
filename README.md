@@ -2,7 +2,7 @@
 
 **A friendly project to learn how AI coding assistants work**
 
-Tasky is a simple task manager (like a to-do list) that you manage entirely through AI assistants like Claude. It's designed to help you learn how modern AI coding tools work, especially something called MCPs (Model Context Protocol).
+Tasky is a simple task manager (like a to-do list) that you manage entirely through AI assistants like Claude. It's designed to help you learn how modern AI coding tools work, especially working with MCPs (Model Context Protocol).
 
 ## Why Tasky?
 

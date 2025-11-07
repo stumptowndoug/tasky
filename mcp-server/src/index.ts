@@ -612,7 +612,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
         // Validate new board if boardId is being updated
         if (args.boardId !== undefined) {
-          const boardValidationError = validateBoardExists(data, String(args.boardId))
+          const boardValidationError = validateBoardExists(
+            data,
+            String(args.boardId)
+          )
           if (boardValidationError) {
             return {
               content: [
@@ -627,9 +630,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         // Determine the target board for column validation
-        const targetBoardId = args.boardId !== undefined
-          ? String(args.boardId)
-          : (data.tasks[taskIndex].boardId || "default")
+        const targetBoardId =
+          args.boardId !== undefined
+            ? String(args.boardId)
+            : data.tasks[taskIndex].boardId || "default"
 
         // Validate column if status is being updated
         if (args.status !== undefined) {
