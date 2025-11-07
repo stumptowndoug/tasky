@@ -2,7 +2,7 @@
   "boards": [
     {
       "id": "default",
-      "name": "My Tasks",
+      "name": "Personal",
       "columns": [
         {
           "id": "todo",
@@ -20,6 +20,37 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "work",
+      "name": "Work",
+      "columns": [
+        {
+          "id": "backlog",
+          "name": "Backlog",
+          "order": 0
+        },
+        {
+          "id": "todo",
+          "name": "To Do",
+          "order": 1
+        },
+        {
+          "id": "in-progress",
+          "name": "In Progress",
+          "order": 2
+        },
+        {
+          "id": "review",
+          "name": "Review",
+          "order": 3
+        },
+        {
+          "id": "done",
+          "name": "Done",
+          "order": 4
+        }
+      ]
     }
   ],
   "tasks": [
@@ -27,66 +58,69 @@
       "id": "task-1",
       "boardId": "default",
       "title": "Welcome to Tasky!",
-      "status": "done",
-      "description": "This is your first task. You can edit it, move it to different columns, or delete it.",
+      "status": "todo",
+      "description": "Tasky is an LLM-first task manager. Use AI assistants like Claude Code to manage your tasks through natural language.",
       "createdAt": "2025-01-06T10:00:00Z",
-      "updatedAt": "2025-11-06T23:30:00Z"
+      "updatedAt": "2025-01-06T10:00:00Z"
     },
     {
       "id": "task-2",
       "boardId": "default",
-      "title": "LLM agents can manage these tasks",
-      "status": "in-progress",
-      "description": "Claude Code and other AI agents can directly edit this JSON file to add, update, or move tasks.",
+      "title": "Try creating a task with AI",
+      "status": "todo",
+      "description": "Ask your AI assistant: 'Add a task to buy groceries with high priority'",
+      "priority": "medium",
+      "tags": ["getting-started"],
       "createdAt": "2025-01-06T10:05:00Z",
-      "updatedAt": "2025-01-06T10:05:00Z",
-      "priority": "high",
-      "tags": [
-        "ai",
-        "automation"
-      ]
+      "updatedAt": "2025-01-06T10:05:00Z"
     },
     {
       "id": "task-3",
       "boardId": "default",
       "title": "Customize your board",
-      "status": "done",
-      "description": "Add custom fields, create new boards, or modify columns as needed.",
+      "status": "in-progress",
+      "description": "Add custom fields, create new boards, or modify columns using the MCP tools.",
+      "priority": "low",
+      "tags": ["customization"],
       "createdAt": "2025-01-06T10:10:00Z",
-      "updatedAt": "2025-01-06T10:10:00Z",
-      "customField": "You can add any custom fields you want!"
+      "updatedAt": "2025-01-06T10:10:00Z"
     },
     {
       "id": "task-4",
-      "boardId": "default",
-      "title": "Real-time file watching test",
-      "status": "in-progress",
-      "description": "This task was added via Claude Code to test the real-time file watching feature!",
-      "createdAt": "2025-11-06T23:12:00Z",
-      "updatedAt": "2025-11-06T23:49:43.116Z",
-      "priority": "medium",
-      "tags": [
-        "test",
-        "real-time"
-      ]
+      "boardId": "work",
+      "title": "Review quarterly goals",
+      "status": "backlog",
+      "description": "Prepare for Q1 planning meeting",
+      "priority": "high",
+      "tags": ["planning"],
+      "createdAt": "2025-01-06T10:15:00Z",
+      "updatedAt": "2025-01-06T10:15:00Z"
     },
     {
       "id": "task-5",
-      "boardId": "default",
-      "title": "Chase's Birthday - November 8th at 2:30 PM PST",
-      "status": "todo",
-      "description": "Reminder for Chase's birthday celebration!\n\nTo-do before the party:\n- Pick up the birthday cake\n- Get balloons\n- Purchase game cards\n\nTime: 2:30 PM PST on November 8th",
-      "createdAt": "2025-11-07T00:41:16.417Z",
-      "updatedAt": "2025-11-07T00:41:16.419Z",
+      "boardId": "work",
+      "title": "Update project documentation",
+      "status": "in-progress",
+      "description": "Add API documentation and usage examples",
+      "priority": "medium",
+      "tags": ["documentation"],
+      "createdAt": "2025-01-06T10:20:00Z",
+      "updatedAt": "2025-01-06T10:20:00Z"
+    },
+    {
+      "id": "task-6",
+      "boardId": "work",
+      "title": "Ship v1.0 release",
+      "status": "done",
+      "description": "First production release with core features",
       "priority": "high",
-      "tags": [
-        "birthday",
-        "reminder"
-      ]
+      "tags": ["milestone", "release"],
+      "createdAt": "2025-01-05T09:00:00Z",
+      "updatedAt": "2025-01-06T10:25:00Z"
     }
   ],
   "metadata": {
     "version": "1.0",
-    "lastModified": "2025-11-07T00:41:16.419Z"
+    "lastModified": "2025-01-06T10:25:00Z"
   }
 }

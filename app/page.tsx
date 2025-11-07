@@ -1,22 +1,20 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
 import { Board } from "@/components/board"
 import { HelpDialog } from "@/components/help-dialog"
 
 export default function IndexPage() {
+  const searchParams = useSearchParams()
+  const boardId = searchParams.get("board") || "default"
+
   return (
     <section className="container py-6">
-      <div className="mb-6 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">My Tasks</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            AI-powered task management with real-time updates
-          </p>
-        </div>
+      <div className="mb-6 flex items-end justify-end">
         <HelpDialog />
       </div>
 
-      <Board boardId="default" />
+      <Board boardId={boardId} />
     </section>
   )
 }

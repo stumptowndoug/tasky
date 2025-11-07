@@ -269,27 +269,42 @@ npm run mcp:watch  # Watch MCP server
 
 Tasky uses npm workspaces to manage both the web app and MCP server in one repo. A single `npm install` at the root installs everything!
 
-## Sharing Tasks
+## Managing Your Tasks
 
-### Option 1: Git-based (Recommended)
+### Individual Use (Keep Tasks Private)
 
-Simply commit the `data/` folder to share tasks with your team:
+If you want to use Tasky for your personal tasks without sharing them:
+
+1. Add `data/tasks.json` to `.gitignore`:
+   ```bash
+   echo "data/tasks.json" >> .gitignore
+   ```
+
+2. Your tasks will stay on your machine only
+3. The repo comes with example data that others will see when they clone
+
+### Team Use (Share Tasks via Git)
+
+By default, `data/tasks.json` is tracked in Git, so you can share tasks with your team:
 
 ```bash
+# Make changes via AI assistants
+# Tasks update automatically in data/tasks.json
+
+# Commit and push to share with team
 git add data/tasks.json
 git commit -m "Update tasks"
 git push
 ```
 
-To keep tasks private, add to `.gitignore`:
+Everyone on your team will see the same tasks when they pull.
 
-```
-data/tasks.json
-```
+### Manual Backup/Transfer
 
-### Option 2: Export/Import
-
-Copy the `data/tasks.json` file and share it manually.
+You can also copy `data/tasks.json` to:
+- Backup your tasks
+- Move between machines
+- Share with specific people
 
 ## Contributing
 
