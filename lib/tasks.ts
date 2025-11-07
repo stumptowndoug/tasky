@@ -7,14 +7,15 @@
 
 import { promises as fs } from "fs"
 import path from "path"
+
 import type {
-  TasksData,
-  Task,
   Board,
-  CreateTaskRequest,
-  UpdateTaskRequest,
   CreateBoardRequest,
+  CreateTaskRequest,
+  Task,
+  TasksData,
   UpdateBoardRequest,
+  UpdateTaskRequest,
 } from "./types"
 
 // Get tasks file path from environment variable or use default
@@ -152,14 +153,18 @@ export async function getBoardById(id: string): Promise<Board | null> {
 /**
  * Create a new board
  */
-export async function createBoard(boardData: CreateBoardRequest): Promise<Board> {
+export async function createBoard(
+  boardData: CreateBoardRequest
+): Promise<Board> {
   const data = await readTasksData()
 
   const newBoard: Board = {
     id: `board-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     name: boardData.name,
     columns: boardData.columns.map((col, index) => ({
-      id: `col-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `col-${Date.now()}-${index}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
       name: col.name,
       order: col.order,
     })),

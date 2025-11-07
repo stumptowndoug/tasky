@@ -8,45 +8,45 @@
  */
 
 // Load environment variables from .env.local or .env
-import { config } from "dotenv";
-config({ path: [".env.local", ".env"] });
-
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { readFile, writeFile } from "fs/promises"
+import { dirname, join } from "path"
+import { fileURLToPath } from "url"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { readFile, writeFile } from "fs/promises";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+} from "@modelcontextprotocol/sdk/types.js"
+import { config } from "dotenv"
+
+config({ path: [".env.local", ".env"] })
 
 // Get the directory of this file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // Path to tasks.json - supports custom path via environment variable
 // Default: mcp-server/dist/index.js -> ../../data/tasks.json
 const TASKS_FILE = process.env.TASKS_FILE_PATH
   ? join(__dirname, "../..", process.env.TASKS_FILE_PATH)
-  : join(__dirname, "../../data/tasks.json");
+  : join(__dirname, "../../data/tasks.json")
 
 /**
  * Read tasks data from file
  */
 async function readTasksData() {
-  const content = await readFile(TASKS_FILE, "utf-8");
-  return JSON.parse(content);
+  const content = await readFile(TASKS_FILE, "utf-8")
+  return JSON.parse(content)
 }
 
 /**
  * Write tasks data to file (atomic write)
  */
 async function writeTasksData(data: any) {
-  data.metadata.lastModified = new Date().toISOString();
-  const tempFile = TASKS_FILE + ".tmp";
-  await writeFile(tempFile, JSON.stringify(data, null, 2), "utf-8");
-  await writeFile(TASKS_FILE, JSON.stringify(data, null, 2), "utf-8");
+  data.metadata.lastModified = new Date().toISOString()
+  const tempFile = TASKS_FILE + ".tmp"
+  await writeFile(tempFile, JSON.stringify(data, null, 2), "utf-8")
+  await writeFile(TASKS_FILE, JSON.stringify(data, null, 2), "utf-8")
 }
 
 /**
@@ -54,16 +54,18 @@ async function writeTasksData(data: any) {
  * Returns error object if board doesn't exist, null if valid
  */
 function validateBoardExists(data: any, boardId: string) {
-  const boardExists = data.boards.some((b: any) => b.id === boardId);
+  const boardExists = data.boards.some((b: any) => b.id === boardId)
 
   if (!boardExists) {
-    const availableBoards = data.boards.map((b: any) => `"${b.id}" (${b.name})`).join(", ");
+    const availableBoards = data.boards
+      .map((b: any) => `"${b.id}" (${b.name})`)
+      .join(", ")
     return {
       error: `Board "${boardId}" does not exist. Available boards: ${availableBoards}`,
-    };
+    }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -71,24 +73,26 @@ function validateBoardExists(data: any, boardId: string) {
  * Returns error object if column doesn't exist, null if valid
  */
 function validateColumnExists(data: any, boardId: string, columnId: string) {
-  const board = data.boards.find((b: any) => b.id === boardId);
+  const board = data.boards.find((b: any) => b.id === boardId)
 
   if (!board) {
     return {
       error: `Board "${boardId}" not found.`,
-    };
+    }
   }
 
-  const columnExists = board.columns.some((c: any) => c.id === columnId);
+  const columnExists = board.columns.some((c: any) => c.id === columnId)
 
   if (!columnExists) {
-    const availableColumns = board.columns.map((c: any) => `"${c.id}" (${c.name})`).join(", ");
+    const availableColumns = board.columns
+      .map((c: any) => `"${c.id}" (${c.name})`)
+      .join(", ")
     return {
       error: `Column "${columnId}" does not exist in board "${board.name}". Available columns: ${availableColumns}`,
-    };
+    }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -96,15 +100,17 @@ function validateColumnExists(data: any, boardId: string, columnId: string) {
  * Returns a formatted string showing all available boards and their columns
  */
 function formatBoardsContext(data: any): string {
-  const boardsInfo = data.boards.map((b: any) => {
-    const columns = b.columns
-      .sort((a: any, b: any) => a.order - b.order)
-      .map((c: any) => c.id)
-      .join(", ");
-    return `- "${b.id}" (${b.name}): ${columns}`;
-  }).join("\n");
+  const boardsInfo = data.boards
+    .map((b: any) => {
+      const columns = b.columns
+        .sort((a: any, b: any) => a.order - b.order)
+        .map((c: any) => c.id)
+        .join(", ")
+      return `- "${b.id}" (${b.name}): ${columns}`
+    })
+    .join("\n")
 
-  return `\n\nAvailable boards and columns:\n${boardsInfo}`;
+  return `\n\nAvailable boards and columns:\n${boardsInfo}`
 }
 
 /**
@@ -115,16 +121,16 @@ function generateTaskId(existingTasks: any[]) {
   // Extract task numbers from existing IDs (format: task-{number})
   const taskNumbers = existingTasks
     .map((task) => {
-      const match = task.id.match(/^task-(\d+)$/);
-      return match ? parseInt(match[1], 10) : 0;
+      const match = task.id.match(/^task-(\d+)$/)
+      return match ? parseInt(match[1], 10) : 0
     })
-    .filter((num) => !isNaN(num));
+    .filter((num) => !isNaN(num))
 
   // Find the highest number, default to 0 if no valid tasks
-  const maxNumber = taskNumbers.length > 0 ? Math.max(...taskNumbers) : 0;
+  const maxNumber = taskNumbers.length > 0 ? Math.max(...taskNumbers) : 0
 
   // Return next sequential ID
-  return `task-${maxNumber + 1}`;
+  return `task-${maxNumber + 1}`
 }
 
 /**
@@ -140,7 +146,7 @@ const server = new Server(
       tools: {},
     },
   }
-);
+)
 
 /**
  * List available tools
@@ -150,13 +156,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "get_tasks",
-        description: "Get all tasks from the board. Returns the complete task list with all fields.",
+        description:
+          "Get all tasks from the board. Returns the complete task list with all fields.",
         inputSchema: {
           type: "object",
           properties: {
             boardId: {
               type: "string",
-              description: "Board ID to filter by (optional, defaults to 'default')",
+              description:
+                "Board ID to filter by (optional, defaults to 'default')",
             },
             status: {
               type: "string",
@@ -167,7 +175,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "add_task",
-        description: "Add a new task to the board. Task IDs are automatically generated sequentially (task-1, task-2, etc.). Supports custom fields - any additional properties beyond core fields will be preserved.",
+        description:
+          "Add a new task to the board. Task IDs are automatically generated sequentially (task-1, task-2, etc.). Supports custom fields - any additional properties beyond core fields will be preserved.",
         inputSchema: {
           type: "object",
           properties: {
@@ -181,15 +190,27 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             status: {
               type: "string",
-              description: "Status/column ID (e.g., 'todo', 'in-progress', 'done'). If not specified, uses the first column of the target board.",
+              description:
+                "Status/column ID (e.g., 'todo', 'in-progress', 'done'). If not specified, uses the first column of the target board.",
             },
             description: {
               type: "string",
               description: "Task description (optional)",
             },
+            dueDate: {
+              type: "string",
+              description:
+                "Due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+            },
+            reminderDate: {
+              type: "string",
+              description:
+                "Reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
+            },
             priority: {
               type: "string",
-              description: "Priority level: low, medium, high, critical (optional)",
+              description:
+                "Priority level: low, medium, high, critical (optional)",
             },
             tags: {
               type: "array",
@@ -198,7 +219,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             customFields: {
               type: "object",
-              description: "Any additional custom fields as key-value pairs (optional)",
+              description:
+                "Any additional custom fields as key-value pairs (optional)",
             },
           },
           required: ["title"],
@@ -206,13 +228,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "update_task",
-        description: "Update an existing task. Can update any field including custom fields.",
+        description:
+          "Update an existing task. Can update any field including custom fields.",
         inputSchema: {
           type: "object",
           properties: {
             taskId: {
               type: "string",
               description: "Task ID to update (required)",
+            },
+            boardId: {
+              type: "string",
+              description: "Move task to a different board (optional)",
             },
             title: {
               type: "string",
@@ -225,6 +252,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             description: {
               type: "string",
               description: "New description (optional)",
+            },
+            dueDate: {
+              type: "string",
+              description:
+                "New due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+            },
+            reminderDate: {
+              type: "string",
+              description:
+                "New reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
             },
             priority: {
               type: "string",
@@ -269,7 +306,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             status: {
               type: "string",
-              description: "Target status/column (e.g., 'todo', 'in-progress', 'done') (required)",
+              description:
+                "Target status/column (e.g., 'todo', 'in-progress', 'done') (required)",
             },
           },
           required: ["taskId", "status"],
@@ -313,7 +351,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             columnId: {
               type: "string",
-              description: "Unique column ID (e.g., 'review', 'testing') (required)",
+              description:
+                "Unique column ID (e.g., 'review', 'testing') (required)",
             },
             name: {
               type: "string",
@@ -355,7 +394,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "delete_column",
-        description: "Delete a column from a board. Note: This will not delete tasks in that column, but orphaned tasks won't be visible.",
+        description:
+          "Delete a column from a board. Note: This will not delete tasks in that column, but orphaned tasks won't be visible.",
         inputSchema: {
           type: "object",
           properties: {
@@ -391,13 +431,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "add_board",
-        description: "Create a new board with default columns (todo, in-progress, done). You can customize columns afterward.",
+        description:
+          "Create a new board with default columns (todo, in-progress, done). You can customize columns afterward.",
         inputSchema: {
           type: "object",
           properties: {
             boardId: {
               type: "string",
-              description: "Unique board ID (e.g., 'project-alpha', 'personal') (required)",
+              description:
+                "Unique board ID (e.g., 'project-alpha', 'personal') (required)",
             },
             name: {
               type: "string",
@@ -409,7 +451,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "delete_board",
-        description: "Delete a board and all its tasks. This action cannot be undone.",
+        description:
+          "Delete a board and all its tasks. This action cannot be undone.",
         inputSchema: {
           type: "object",
           properties: {
@@ -422,56 +465,58 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
     ],
-  };
-});
+  }
+})
 
 /**
  * Handle tool calls
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+  const { name, arguments: args } = request.params
 
   if (!args) {
     return {
       content: [{ type: "text", text: "No arguments provided" }],
       isError: true,
-    };
+    }
   }
 
   try {
     switch (name) {
       case "get_tasks": {
-        const data = await readTasksData();
-        let tasks = data.tasks;
+        const data = await readTasksData()
+        let tasks = data.tasks
 
         // Filter by board if specified
         if (args.boardId) {
-          tasks = tasks.filter((t: any) => t.boardId === args.boardId);
+          tasks = tasks.filter((t: any) => t.boardId === args.boardId)
         } else {
-          tasks = tasks.filter((t: any) => t.boardId === "default");
+          tasks = tasks.filter((t: any) => t.boardId === "default")
         }
 
         // Filter by status if specified
         if (args.status) {
-          tasks = tasks.filter((t: any) => t.status === args.status);
+          tasks = tasks.filter((t: any) => t.status === args.status)
         }
 
         return {
           content: [
             {
               type: "text",
-              text: `${JSON.stringify(tasks, null, 2)}${formatBoardsContext(data)}`,
+              text: `${JSON.stringify(tasks, null, 2)}${formatBoardsContext(
+                data
+              )}`,
             },
           ],
-        };
+        }
       }
 
       case "add_task": {
-        const data = await readTasksData();
-        const boardId = String(args.boardId || "default");
+        const data = await readTasksData()
+        const boardId = String(args.boardId || "default")
 
         // Validate board exists
-        const boardValidationError = validateBoardExists(data, boardId);
+        const boardValidationError = validateBoardExists(data, boardId)
         if (boardValidationError) {
           return {
             content: [
@@ -481,21 +526,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         // Default to first column of the target board if status not provided
-        let status: string;
+        let status: string
         if (args.status) {
-          status = String(args.status);
+          status = String(args.status)
         } else {
-          const board = data.boards.find((b: any) => b.id === boardId);
-          const firstColumn = board.columns.sort((a: any, b: any) => a.order - b.order)[0];
-          status = firstColumn.id;
+          const board = data.boards.find((b: any) => b.id === boardId)
+          const firstColumn = board.columns.sort(
+            (a: any, b: any) => a.order - b.order
+          )[0]
+          status = firstColumn.id
         }
 
         // Validate column exists
-        const columnValidationError = validateColumnExists(data, boardId, status);
+        const columnValidationError = validateColumnExists(
+          data,
+          boardId,
+          status
+        )
         if (columnValidationError) {
           return {
             content: [
@@ -505,7 +556,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         const newTask: any = {
@@ -516,30 +567,36 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           description: args.description || "",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        };
-
-        if (args.priority) newTask.priority = args.priority;
-        if (args.tags) newTask.tags = args.tags;
-        if (args.customFields && typeof args.customFields === 'object') {
-          Object.assign(newTask, args.customFields);
         }
 
-        data.tasks.push(newTask);
-        await writeTasksData(data);
+        if (args.dueDate) newTask.dueDate = args.dueDate
+        if (args.reminderDate) newTask.reminderDate = args.reminderDate
+        if (args.priority) newTask.priority = args.priority
+        if (args.tags) newTask.tags = args.tags
+        if (args.customFields && typeof args.customFields === "object") {
+          Object.assign(newTask, args.customFields)
+        }
+
+        data.tasks.push(newTask)
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Task created successfully!\n\n${JSON.stringify(newTask, null, 2)}${formatBoardsContext(data)}`,
+              text: `Task created successfully!\n\n${JSON.stringify(
+                newTask,
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "update_task": {
-        const data = await readTasksData();
-        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId);
+        const data = await readTasksData()
+        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId)
 
         if (taskIndex === -1) {
           return {
@@ -550,13 +607,41 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
+
+        // Validate new board if boardId is being updated
+        if (args.boardId !== undefined) {
+          const boardValidationError = validateBoardExists(
+            data,
+            String(args.boardId)
+          )
+          if (boardValidationError) {
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: boardValidationError.error,
+                },
+              ],
+              isError: true,
+            }
+          }
+        }
+
+        // Determine the target board for column validation
+        const targetBoardId =
+          args.boardId !== undefined
+            ? String(args.boardId)
+            : data.tasks[taskIndex].boardId || "default"
 
         // Validate column if status is being updated
         if (args.status !== undefined) {
-          const taskBoardId = data.tasks[taskIndex].boardId || "default";
-          const columnValidationError = validateColumnExists(data, taskBoardId, String(args.status));
+          const columnValidationError = validateColumnExists(
+            data,
+            targetBoardId,
+            String(args.status)
+          )
           if (columnValidationError) {
             return {
               content: [
@@ -566,43 +651,52 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 },
               ],
               isError: true,
-            };
+            }
           }
         }
 
         const updates: any = {
           updatedAt: new Date().toISOString(),
-        };
+        }
 
-        if (args.title !== undefined) updates.title = args.title;
-        if (args.status !== undefined) updates.status = args.status;
-        if (args.description !== undefined) updates.description = args.description;
-        if (args.priority !== undefined) updates.priority = args.priority;
-        if (args.tags !== undefined) updates.tags = args.tags;
+        if (args.boardId !== undefined) updates.boardId = args.boardId
+        if (args.title !== undefined) updates.title = args.title
+        if (args.status !== undefined) updates.status = args.status
+        if (args.description !== undefined)
+          updates.description = args.description
+        if (args.dueDate !== undefined) updates.dueDate = args.dueDate
+        if (args.reminderDate !== undefined)
+          updates.reminderDate = args.reminderDate
+        if (args.priority !== undefined) updates.priority = args.priority
+        if (args.tags !== undefined) updates.tags = args.tags
         if (args.customFields) {
-          Object.assign(updates, args.customFields);
+          Object.assign(updates, args.customFields)
         }
 
         data.tasks[taskIndex] = {
           ...data.tasks[taskIndex],
           ...updates,
-        };
+        }
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Task updated successfully!\n\n${JSON.stringify(data.tasks[taskIndex], null, 2)}${formatBoardsContext(data)}`,
+              text: `Task updated successfully!\n\n${JSON.stringify(
+                data.tasks[taskIndex],
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "delete_task": {
-        const data = await readTasksData();
-        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId);
+        const data = await readTasksData()
+        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId)
 
         if (taskIndex === -1) {
           return {
@@ -613,26 +707,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const deletedTask = data.tasks[taskIndex];
-        data.tasks.splice(taskIndex, 1);
-        await writeTasksData(data);
+        const deletedTask = data.tasks[taskIndex]
+        data.tasks.splice(taskIndex, 1)
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Task deleted successfully!\n\nDeleted task: ${deletedTask.title}${formatBoardsContext(data)}`,
+              text: `Task deleted successfully!\n\nDeleted task: ${
+                deletedTask.title
+              }${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "move_task": {
-        const data = await readTasksData();
-        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId);
+        const data = await readTasksData()
+        const taskIndex = data.tasks.findIndex((t: any) => t.id === args.taskId)
 
         if (taskIndex === -1) {
           return {
@@ -643,12 +739,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         // Validate column exists in task's board
-        const taskBoardId = data.tasks[taskIndex].boardId || "default";
-        const columnValidationError = validateColumnExists(data, taskBoardId, String(args.status));
+        const taskBoardId = data.tasks[taskIndex].boardId || "default"
+        const columnValidationError = validateColumnExists(
+          data,
+          taskBoardId,
+          String(args.status)
+        )
         if (columnValidationError) {
           return {
             content: [
@@ -658,26 +758,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        data.tasks[taskIndex].status = args.status;
-        data.tasks[taskIndex].updatedAt = new Date().toISOString();
+        data.tasks[taskIndex].status = args.status
+        data.tasks[taskIndex].updatedAt = new Date().toISOString()
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Task moved successfully!\n\n${data.tasks[taskIndex].title} → ${args.status}${formatBoardsContext(data)}`,
+              text: `Task moved successfully!\n\n${
+                data.tasks[taskIndex].title
+              } → ${args.status}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "get_boards": {
-        const data = await readTasksData();
+        const data = await readTasksData()
 
         return {
           content: [
@@ -686,40 +788,44 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               text: JSON.stringify(data.boards, null, 2),
             },
           ],
-        };
+        }
       }
 
       case "search_tasks": {
-        const data = await readTasksData();
-        const query = String(args.query || "").toLowerCase();
-        let tasks = data.tasks;
+        const data = await readTasksData()
+        const query = String(args.query || "").toLowerCase()
+        let tasks = data.tasks
 
         if (args.boardId) {
-          tasks = tasks.filter((t: any) => t.boardId === args.boardId);
+          tasks = tasks.filter((t: any) => t.boardId === args.boardId)
         }
 
         const results = tasks.filter((t: any) => {
-          const titleMatch = t.title.toLowerCase().includes(query);
-          const descMatch = t.description?.toLowerCase().includes(query);
-          return titleMatch || descMatch;
-        });
+          const titleMatch = t.title.toLowerCase().includes(query)
+          const descMatch = t.description?.toLowerCase().includes(query)
+          return titleMatch || descMatch
+        })
 
         return {
           content: [
             {
               type: "text",
-              text: `Found ${results.length} task(s):\n\n${JSON.stringify(results, null, 2)}${formatBoardsContext(data)}`,
+              text: `Found ${results.length} task(s):\n\n${JSON.stringify(
+                results,
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "add_column": {
-        const data = await readTasksData();
-        const boardId = String(args.boardId || "default");
+        const data = await readTasksData()
+        const boardId = String(args.boardId || "default")
 
         // Validate board exists
-        const validationError = validateBoardExists(data, boardId);
+        const validationError = validateBoardExists(data, boardId)
         if (validationError) {
           return {
             content: [
@@ -729,15 +835,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId)
 
         // Check if column ID already exists
         const existingColumn = data.boards[boardIndex].columns.find(
           (c: any) => c.id === args.columnId
-        );
+        )
         if (existingColumn) {
           return {
             content: [
@@ -747,38 +853,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         const newColumn = {
           id: args.columnId,
           name: args.name,
-          order: args.order !== undefined ? args.order : data.boards[boardIndex].columns.length,
-        };
+          order:
+            args.order !== undefined
+              ? args.order
+              : data.boards[boardIndex].columns.length,
+        }
 
-        data.boards[boardIndex].columns.push(newColumn);
+        data.boards[boardIndex].columns.push(newColumn)
 
         // Sort columns by order
-        data.boards[boardIndex].columns.sort((a: any, b: any) => a.order - b.order);
+        data.boards[boardIndex].columns.sort(
+          (a: any, b: any) => a.order - b.order
+        )
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Column added successfully!\n\n${JSON.stringify(newColumn, null, 2)}${formatBoardsContext(data)}`,
+              text: `Column added successfully!\n\n${JSON.stringify(
+                newColumn,
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "update_column": {
-        const data = await readTasksData();
-        const boardId = String(args.boardId || "default");
+        const data = await readTasksData()
+        const boardId = String(args.boardId || "default")
 
         // Validate board exists
-        const validationError = validateBoardExists(data, boardId);
+        const validationError = validateBoardExists(data, boardId)
         if (validationError) {
           return {
             content: [
@@ -788,14 +903,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId)
 
         const columnIndex = data.boards[boardIndex].columns.findIndex(
           (c: any) => c.id === args.columnId
-        );
+        )
 
         if (columnIndex === -1) {
           return {
@@ -806,37 +921,43 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         if (args.name !== undefined) {
-          data.boards[boardIndex].columns[columnIndex].name = args.name;
+          data.boards[boardIndex].columns[columnIndex].name = args.name
         }
 
         if (args.order !== undefined) {
-          data.boards[boardIndex].columns[columnIndex].order = args.order;
+          data.boards[boardIndex].columns[columnIndex].order = args.order
           // Sort columns by order
-          data.boards[boardIndex].columns.sort((a: any, b: any) => a.order - b.order);
+          data.boards[boardIndex].columns.sort(
+            (a: any, b: any) => a.order - b.order
+          )
         }
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Column updated successfully!\n\n${JSON.stringify(data.boards[boardIndex].columns[columnIndex], null, 2)}${formatBoardsContext(data)}`,
+              text: `Column updated successfully!\n\n${JSON.stringify(
+                data.boards[boardIndex].columns[columnIndex],
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "delete_column": {
-        const data = await readTasksData();
-        const boardId = String(args.boardId || "default");
+        const data = await readTasksData()
+        const boardId = String(args.boardId || "default")
 
         // Validate board exists
-        const validationError = validateBoardExists(data, boardId);
+        const validationError = validateBoardExists(data, boardId)
         if (validationError) {
           return {
             content: [
@@ -846,14 +967,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId)
 
         const columnIndex = data.boards[boardIndex].columns.findIndex(
           (c: any) => c.id === args.columnId
-        );
+        )
 
         if (columnIndex === -1) {
           return {
@@ -864,30 +985,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const deletedColumn = data.boards[boardIndex].columns[columnIndex];
-        data.boards[boardIndex].columns.splice(columnIndex, 1);
+        const deletedColumn = data.boards[boardIndex].columns[columnIndex]
+        data.boards[boardIndex].columns.splice(columnIndex, 1)
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Column deleted successfully!\n\nDeleted: ${deletedColumn.name} (${deletedColumn.id})${formatBoardsContext(data)}`,
+              text: `Column deleted successfully!\n\nDeleted: ${
+                deletedColumn.name
+              } (${deletedColumn.id})${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "update_board": {
-        const data = await readTasksData();
-        const boardId = String(args.boardId || "default");
+        const data = await readTasksData()
+        const boardId = String(args.boardId || "default")
 
         // Validate board exists
-        const validationError = validateBoardExists(data, boardId);
+        const validationError = validateBoardExists(data, boardId)
         if (validationError) {
           return {
             content: [
@@ -897,30 +1020,36 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId)
 
-        data.boards[boardIndex].name = args.name;
+        data.boards[boardIndex].name = args.name
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Board updated successfully!\n\n${JSON.stringify(data.boards[boardIndex], null, 2)}${formatBoardsContext(data)}`,
+              text: `Board updated successfully!\n\n${JSON.stringify(
+                data.boards[boardIndex],
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "add_board": {
-        const data = await readTasksData();
+        const data = await readTasksData()
 
         // Check if board ID already exists
-        const existingBoard = data.boards.find((b: any) => b.id === args.boardId);
+        const existingBoard = data.boards.find(
+          (b: any) => b.id === args.boardId
+        )
         if (existingBoard) {
           return {
             content: [
@@ -930,7 +1059,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
         const newBoard = {
@@ -953,27 +1082,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               order: 2,
             },
           ],
-        };
+        }
 
-        data.boards.push(newBoard);
+        data.boards.push(newBoard)
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Board created successfully!\n\n${JSON.stringify(newBoard, null, 2)}${formatBoardsContext(data)}`,
+              text: `Board created successfully!\n\n${JSON.stringify(
+                newBoard,
+                null,
+                2
+              )}${formatBoardsContext(data)}`,
             },
           ],
-        };
+        }
       }
 
       case "delete_board": {
-        const data = await readTasksData();
+        const data = await readTasksData()
 
         // Validate board exists
-        const validationError = validateBoardExists(data, String(args.boardId));
+        const validationError = validateBoardExists(data, String(args.boardId))
         if (validationError) {
           return {
             content: [
@@ -983,10 +1116,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const boardIndex = data.boards.findIndex((b: any) => b.id === args.boardId);
+        const boardIndex = data.boards.findIndex(
+          (b: any) => b.id === args.boardId
+        )
 
         // Prevent deleting the default board if it's the only one
         if (data.boards.length === 1) {
@@ -998,29 +1133,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               },
             ],
             isError: true,
-          };
+          }
         }
 
-        const deletedBoard = data.boards[boardIndex];
+        const deletedBoard = data.boards[boardIndex]
 
         // Delete the board
-        data.boards.splice(boardIndex, 1);
+        data.boards.splice(boardIndex, 1)
 
         // Delete all tasks associated with this board
-        const tasksBeforeCount = data.tasks.length;
-        data.tasks = data.tasks.filter((t: any) => t.boardId !== args.boardId);
-        const tasksDeletedCount = tasksBeforeCount - data.tasks.length;
+        const tasksBeforeCount = data.tasks.length
+        data.tasks = data.tasks.filter((t: any) => t.boardId !== args.boardId)
+        const tasksDeletedCount = tasksBeforeCount - data.tasks.length
 
-        await writeTasksData(data);
+        await writeTasksData(data)
 
         return {
           content: [
             {
               type: "text",
-              text: `Board deleted successfully!\n\nDeleted: ${deletedBoard.name} (${deletedBoard.id})\nTasks deleted: ${tasksDeletedCount}${formatBoardsContext(data)}`,
+              text: `Board deleted successfully!\n\nDeleted: ${
+                deletedBoard.name
+              } (${
+                deletedBoard.id
+              })\nTasks deleted: ${tasksDeletedCount}${formatBoardsContext(
+                data
+              )}`,
             },
           ],
-        };
+        }
       }
 
       default:
@@ -1032,31 +1173,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
           isError: true,
-        };
+        }
     }
   } catch (error) {
     return {
       content: [
         {
           type: "text",
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+          text: `Error: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
         },
       ],
       isError: true,
-    };
+    }
   }
-});
+})
 
 /**
  * Start the server
  */
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Tasky MCP server running on stdio");
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
+  console.error("Tasky MCP server running on stdio")
 }
 
 main().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
-});
+  console.error("Fatal error:", error)
+  process.exit(1)
+})

@@ -1,7 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { Check, Copy } from "lucide-react"
+
 import { Task } from "@/lib/types"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,9 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Copy, Check } from "lucide-react"
+
 import { TaskDetailDialog } from "./task-detail-dialog"
 
 interface TaskCardProps {
@@ -23,7 +25,16 @@ export function TaskCard({ task }: TaskCardProps) {
   const [copied, setCopied] = useState(false)
 
   // Extract core fields
-  const { id, boardId, title, status, description, createdAt, updatedAt, ...customFields } = task
+  const {
+    id,
+    boardId,
+    title,
+    status,
+    description,
+    createdAt,
+    updatedAt,
+    ...customFields
+  } = task
 
   // Extract common custom fields for special display
   const priority = customFields.priority as string | undefined
@@ -43,12 +54,15 @@ export function TaskCard({ task }: TaskCardProps) {
 
   return (
     <>
-      <Card className="transition-all h-[180px] flex flex-col overflow-hidden hover:shadow-lg">
+      <Card className="flex h-[180px] flex-col overflow-hidden transition-all hover:shadow-lg">
         {/* Card Content - Clickable */}
-        <div className="flex-1 flex flex-col overflow-hidden cursor-pointer" onClick={() => setIsOpen(true)}>
-          <CardHeader className="pb-3 flex-shrink-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <CardTitle className="text-base font-medium leading-snug line-clamp-2 flex-1">
+        <div
+          className="flex flex-1 cursor-pointer flex-col overflow-hidden"
+          onClick={() => setIsOpen(true)}
+        >
+          <CardHeader className="shrink-0 pb-3">
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <CardTitle className="line-clamp-2 flex-1 text-base font-medium leading-snug">
                 {title}
               </CardTitle>
               {priority && (
@@ -58,16 +72,16 @@ export function TaskCard({ task }: TaskCardProps) {
               )}
             </div>
             {description && (
-              <CardDescription className="mt-1.5 text-sm line-clamp-3">
+              <CardDescription className="mt-1.5 line-clamp-3 text-sm">
                 {description}
               </CardDescription>
             )}
           </CardHeader>
 
           {(tags || otherCustomFields.length > 0) && (
-            <CardContent className="pb-3 pt-0 flex-shrink-0">
+            <CardContent className="shrink-0 pb-3 pt-0">
               {tags && tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-2">
+                <div className="mb-2 flex flex-wrap gap-1.5">
                   {tags.slice(0, 3).map((tag, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {tag}
@@ -91,7 +105,8 @@ export function TaskCard({ task }: TaskCardProps) {
                   ))}
                   {otherCustomFields.length > 1 && (
                     <div className="text-xs text-muted-foreground">
-                      +{otherCustomFields.length - 1} more field{otherCustomFields.length > 2 ? 's' : ''}
+                      +{otherCustomFields.length - 1} more field
+                      {otherCustomFields.length > 2 ? "s" : ""}
                     </div>
                   )}
                 </div>
@@ -101,20 +116,23 @@ export function TaskCard({ task }: TaskCardProps) {
         </div>
 
         {/* Task ID Bar - Full width at bottom */}
-        <div className="bg-card px-3 py-2 flex items-center justify-between border-t border-border flex-shrink-0">
-          <code className="text-xs font-bold tracking-wide" style={{ color: 'hsl(191.6 91.4% 36.5%)' }}>
+        <div className="flex shrink-0 items-center justify-between border-t border-border bg-card px-3 py-2">
+          <code
+            className="text-xs font-bold tracking-wide"
+            style={{ color: "hsl(191.6 91.4% 36.5%)" }}
+          >
             {id}
           </code>
           <Button
             variant="ghost"
             size="sm"
             onClick={copyTaskId}
-            className="h-6 w-6 p-0 hover:bg-primary/10"
+            className="size-6 p-0 hover:bg-primary/10"
           >
             {copied ? (
-              <Check className="h-3 w-3 text-primary" />
+              <Check className="size-3 text-primary" />
             ) : (
-              <Copy className="h-3 w-3 text-primary/70" />
+              <Copy className="size-3 text-primary/70" />
             )}
           </Button>
         </div>

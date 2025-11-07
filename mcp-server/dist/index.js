@@ -6,14 +6,14 @@
  * Works with Claude Desktop, Cursor, and other MCP-compatible tools.
  */
 // Load environment variables from .env.local or .env
-import { config } from "dotenv";
-config({ path: [".env.local", ".env"] });
+import { readFile, writeFile } from "fs/promises";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
-import { readFile, writeFile } from "fs/promises";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { config } from "dotenv";
+config({ path: [".env.local", ".env"] });
 // Get the directory of this file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -45,7 +45,9 @@ async function writeTasksData(data) {
 function validateBoardExists(data, boardId) {
     const boardExists = data.boards.some((b) => b.id === boardId);
     if (!boardExists) {
-        const availableBoards = data.boards.map((b) => `"${b.id}" (${b.name})`).join(", ");
+        const availableBoards = data.boards
+            .map((b) => `"${b.id}" (${b.name})`)
+            .join(", ");
         return {
             error: `Board "${boardId}" does not exist. Available boards: ${availableBoards}`,
         };
@@ -65,7 +67,9 @@ function validateColumnExists(data, boardId, columnId) {
     }
     const columnExists = board.columns.some((c) => c.id === columnId);
     if (!columnExists) {
-        const availableColumns = board.columns.map((c) => `"${c.id}" (${c.name})`).join(", ");
+        const availableColumns = board.columns
+            .map((c) => `"${c.id}" (${c.name})`)
+            .join(", ");
         return {
             error: `Column "${columnId}" does not exist in board "${board.name}". Available columns: ${availableColumns}`,
         };
@@ -77,13 +81,15 @@ function validateColumnExists(data, boardId, columnId) {
  * Returns a formatted string showing all available boards and their columns
  */
 function formatBoardsContext(data) {
-    const boardsInfo = data.boards.map((b) => {
+    const boardsInfo = data.boards
+        .map((b) => {
         const columns = b.columns
             .sort((a, b) => a.order - b.order)
             .map((c) => c.id)
             .join(", ");
         return `- "${b.id}" (${b.name}): ${columns}`;
-    }).join("\n");
+    })
+        .join("\n");
     return `\n\nAvailable boards and columns:\n${boardsInfo}`;
 }
 /**
@@ -159,6 +165,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                             type: "string",
                             description: "Task description (optional)",
                         },
+                        dueDate: {
+                            type: "string",
+                            description: "Due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+                        },
+                        reminderDate: {
+                            type: "string",
+                            description: "Reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
+                        },
                         priority: {
                             type: "string",
                             description: "Priority level: low, medium, high, critical (optional)",
@@ -186,6 +200,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                             type: "string",
                             description: "Task ID to update (required)",
                         },
+                        boardId: {
+                            type: "string",
+                            description: "Move task to a different board (optional)",
+                        },
                         title: {
                             type: "string",
                             description: "New title (optional)",
@@ -197,6 +215,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         description: {
                             type: "string",
                             description: "New description (optional)",
+                        },
+                        dueDate: {
+                            type: "string",
+                            description: "New due date in ISO 8601 format (e.g., '2025-01-15T00:00:00Z' or '2025-01-15') (optional)",
+                        },
+                        reminderDate: {
+                            type: "string",
+                            description: "New reminder date in ISO 8601 format (e.g., '2025-01-14T00:00:00Z' or '2025-01-14') (optional)",
                         },
                         priority: {
                             type: "string",
@@ -480,11 +506,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 };
+                if (args.dueDate)
+                    newTask.dueDate = args.dueDate;
+                if (args.reminderDate)
+                    newTask.reminderDate = args.reminderDate;
                 if (args.priority)
                     newTask.priority = args.priority;
                 if (args.tags)
                     newTask.tags = args.tags;
-                if (args.customFields && typeof args.customFields === 'object') {
+                if (args.customFields && typeof args.customFields === "object") {
                     Object.assign(newTask, args.customFields);
                 }
                 data.tasks.push(newTask);
@@ -512,10 +542,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         isError: true,
                     };
                 }
+                // Validate new board if boardId is being updated
+                if (args.boardId !== undefined) {
+                    const boardValidationError = validateBoardExists(data, String(args.boardId));
+                    if (boardValidationError) {
+                        return {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: boardValidationError.error,
+                                },
+                            ],
+                            isError: true,
+                        };
+                    }
+                }
+                // Determine the target board for column validation
+                const targetBoardId = args.boardId !== undefined
+                    ? String(args.boardId)
+                    : (data.tasks[taskIndex].boardId || "default");
                 // Validate column if status is being updated
                 if (args.status !== undefined) {
-                    const taskBoardId = data.tasks[taskIndex].boardId || "default";
-                    const columnValidationError = validateColumnExists(data, taskBoardId, String(args.status));
+                    const columnValidationError = validateColumnExists(data, targetBoardId, String(args.status));
                     if (columnValidationError) {
                         return {
                             content: [
@@ -531,12 +579,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const updates = {
                     updatedAt: new Date().toISOString(),
                 };
+                if (args.boardId !== undefined)
+                    updates.boardId = args.boardId;
                 if (args.title !== undefined)
                     updates.title = args.title;
                 if (args.status !== undefined)
                     updates.status = args.status;
                 if (args.description !== undefined)
                     updates.description = args.description;
+                if (args.dueDate !== undefined)
+                    updates.dueDate = args.dueDate;
+                if (args.reminderDate !== undefined)
+                    updates.reminderDate = args.reminderDate;
                 if (args.priority !== undefined)
                     updates.priority = args.priority;
                 if (args.tags !== undefined)
@@ -689,7 +743,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const newColumn = {
                     id: args.columnId,
                     name: args.name,
-                    order: args.order !== undefined ? args.order : data.boards[boardIndex].columns.length,
+                    order: args.order !== undefined
+                        ? args.order
+                        : data.boards[boardIndex].columns.length,
                 };
                 data.boards[boardIndex].columns.push(newColumn);
                 // Sort columns by order

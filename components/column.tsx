@@ -11,14 +11,14 @@ interface ColumnProps {
 
 export function Column({ column, tasks }: ColumnProps) {
   return (
-    <div className="flex flex-col h-full min-w-[320px] max-w-[320px] bg-muted dark:bg-muted/30 rounded-lg p-4">
+    <div className="flex h-full min-w-[320px] max-w-[320px] flex-col rounded-lg bg-muted p-4 dark:bg-muted/30">
       {/* Column Header */}
-      <div className="flex items-center justify-between mb-4 pb-3 relative before:absolute before:bottom-0 before:left-0 before:right-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/20 before:to-transparent">
+      <div className="relative mb-4 flex items-center justify-between pb-3 before:absolute before:inset-x-0 before:bottom-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/20 before:to-transparent">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-sm text-foreground">
+          <h3 className="text-sm font-semibold text-foreground">
             {column.name}
           </h3>
-          <span className="text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-full shadow-sm">
+          <span className="rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground shadow-sm">
             {tasks.length}
           </span>
         </div>
@@ -31,7 +31,7 @@ export function Column({ column, tasks }: ColumnProps) {
         ))}
 
         {tasks.length === 0 && (
-          <div className="flex items-center justify-center h-32 text-sm text-muted-foreground bg-card/50 rounded-lg">
+          <div className="flex h-32 items-center justify-center rounded-lg bg-card/50 text-sm text-muted-foreground">
             No tasks yet
           </div>
         )}

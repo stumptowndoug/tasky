@@ -1,346 +1,256 @@
-# Tasky
+# Tasky - Learn AI Coding Tools & MCPs
 
-A minimal, LLM-friendly task management app with a beautiful kanban board.
+**A friendly project to learn how AI coding assistants work**
 
-## Overview
+Tasky is a simple task manager (like a to-do list) that you manage entirely through AI assistants like Claude. It's designed to help you learn how modern AI coding tools work, especially working with MCPs (Model Context Protocol).
 
-Tasky is designed for seamless collaboration between humans and AI agents. Tasks are stored in a simple JSON file that can be edited directly by LLM agents like Claude Code, making task management effortless and automated.
+## Why Tasky?
 
-## Features
+Instead of clicking buttons to add tasks, you'll tell an AI assistant like Claude Code to do it for you. This teaches you:
 
-- **Read-Only Kanban Board** - Beautiful, minimal display-only interface
-- **LLM-First Design** - Designed exclusively for AI agent management
-- **MCP Server** - Model Context Protocol server for Claude Desktop & other AI tools
-- **Real-time File Watching** - Instant updates via Server-Sent Events (no polling!)
-- **Custom Fields** - Add unlimited custom fields to any task
-- **Dark Mode** - Beautiful light and dark themes
-- **Local-First** - All data stored locally in `data/tasks.json`
-- **Zero Manual Editing** - All changes through AI assistants or direct file editing
-- **Fully Open Source** - Built with Next.js, TypeScript, and shadcn/ui
+- How to work with AI coding assistants
+- What MCPs are and why they're useful
+- How AI tools can interact with your projects
+- How modern developers use AI to build software
 
-## Quick Start
+**Perfect for**: Anyone curious about AI coding tools, even if you're new to programming!
 
-### Option 1: Using Make (Recommended)
+---
+
+## What You'll Need
+
+Before starting, make sure you have these tools installed:
+
+### 1. Node.js (JavaScript runtime)
+
+**What it is**: The engine that runs this project
+**Check if you have it**: Open Terminal (Mac) or Command Prompt (Windows) and type:
+```bash
+node --version
+```
+
+**If you see a version number** (like `v20.x.x`), you're good!
+**If you get an error**: Download and install from [nodejs.org](https://nodejs.org/) - choose the "LTS" version (recommended for most users)
+
+### 2. An AI Coding Assistant
+
+You need an ai coding assistant. Here are some examples:
+
+- **Claude Code** (Recommended for beginners) - [Get it here](https://claude.ai/claude-code)
+- **Cursor** - [cursor.com](https://cursor.com)
+- **Codex CLI** - [openai.com/codex/](https://github.com/openai/codex)
+- **OpenCode** - [opencode.ai/](https://github.com/sst/opencode)
+
+### 3. A Code Editor (Or Cursor)
+
+- **VS Code** - [code.visualstudio.com](https://code.visualstudio.com/) (Free and beginner-friendly)
+- Or use the editor built into Claude Code/Cursor
+
+---
+
+## Getting Started
+
+### Step 1: Download the Project
+
+**Option A: Using Git (recommended)**
+```bash
+git clone https://github.com/YOUR_USERNAME/tasky.git
+cd tasky
+```
+
+**Option B: Download as ZIP**
+1. Click the green "Code" button on GitHub
+2. Select "Download ZIP"
+3. Unzip the file
+4. Open Terminal and navigate to the folder:
+   ```bash
+   cd path/to/tasky
+   ```
+
+### Step 2: Install Everything
+
+In your Terminal (inside the tasky folder), run:
 
 ```bash
-make install    # One-time setup (installs everything)
-make dev        # Start the development server (opens http://localhost:3737)
+npm run setup
 ```
 
-### Option 2: Using npm
+**What this does**: Downloads and installs all the code libraries this project needs. This might take 1-2 minutes. You only need to do this once!
+
+**You'll know it worked when**: You see messages like "Setup complete!" with no errors.
+
+### Step 3: Start the App
 
 ```bash
-npm run setup   # One-time setup (installs everything)
-npm run dev     # Start the development server
-# Open http://localhost:3737
+npm run dev
 ```
 
-### MCP Server (Auto-configured!)
+**What this does**: Starts the task manager so you can see it in your browser.
 
-The project includes MCP server support for AI tools:
-
-```bash
-make mcp-build  # or: npm run mcp:build
+**You'll know it worked when**: You see a message like:
+```
+✓ Ready on http://localhost:3737
 ```
 
-**Auto-configured for:**
-- ✅ **Claude Code** - Works out of the box (`.mcp.json`)
-- ✅ **Cursor** - Works out of the box (`.cursor/mcp.json`)
-- **Codex CLI** - See [MCP_SETUP.md](docs/MCP_SETUP.md)
-- **Claude Desktop** - See [mcp-server/README.md](mcp-server/README.md)
+**Now open your browser** and go to: **http://localhost:3737**
 
-**Note:** The installs are one-time only (or when dependencies change). Daily use is just `make dev` or `npm run dev`!
+You should see a beautiful kanban board with some example tasks!
 
-## For Users
-
-### Managing Tasks
-
-This is an **LLM-first task manager**. The board is **read-only** by design - all task management happens through AI assistants.
-
-- **View Tasks**: Beautiful kanban board with real-time updates
-- **Add/Edit/Delete Tasks**: Use AI assistants (Claude Code, Cursor, Copilot)
-- **Real-time Updates**: Changes appear instantly via file watching
-- **Dark Mode**: Toggle theme using the button in the top-right corner
-
-### Using AI Assistants
-
-Simply tell your AI assistant what you want:
-
-- "Add a task to research databases"
-- "Move the authentication task to done"
-- "Update all high priority tasks from yesterday"
-- "Organize completed tasks by adding tags"
-
-**Recommended AI Tools:**
-- **Claude Code** (this tool!) - Best integration
-- **Claude Desktop** - Use via MCP Server (see below)
-- **Cursor** - Great for inline editing
-- **GitHub Copilot** - Works with the JSON file
-
-### Using MCP Server (All AI Tools)
-
-Tasky includes an MCP server for deep integration with AI assistants:
-
-**Auto-configured tools** (no setup needed):
-- **Claude Code** - Just open the project
-- **Cursor** - Just open the project
-
-**Manual setup required**:
-- **Claude Desktop** - See [mcp-server/README.md](mcp-server/README.md)
-- **Codex CLI** - See [docs/MCP_SETUP.md](docs/MCP_SETUP.md)
-
-Once configured, you can ask any AI tool:
-- "Show me all my tasks"
-- "Add a high-priority task for API testing"
-- "Move the authentication task to done"
-- "Search for tasks about databases"
-
-**Full setup guide: [docs/MCP_SETUP.md](docs/MCP_SETUP.md)**
-
-### Customizing Colors
-
-All colors are defined using CSS variables in `styles/globals.css`. You can easily customize:
-
-- Background colors
-- Text colors
-- Border colors
-- Accent colors
-- Button colors
-
-Simply edit the `:root` and `.dark` sections in `globals.css` to match your preferred color scheme.
-
-### Data Storage
-
-All your tasks are stored in `data/tasks.json`. You can:
-
-- **Backup**: Copy the `data/` folder
-- **Share**: Commit `data/tasks.json` to git
-- **Edit Directly**: Modify the JSON file manually
-- **Version Control**: Track changes with git
-
-## For AI Agents (Claude Code, GPT, etc.)
-
-**👉 See [docs/LLM_GUIDE.md](docs/LLM_GUIDE.md) for detailed instructions**
-
-### Quick Reference
-
-The tasks are stored in `data/tasks.json` with this structure:
-
-```json
-{
-  "boards": [
-    {
-      "id": "default",
-      "name": "My Tasks",
-      "columns": [
-        {"id": "todo", "name": "To Do", "order": 0},
-        {"id": "in-progress", "name": "In Progress", "order": 1},
-        {"id": "done", "name": "Done", "order": 2}
-      ]
-    }
-  ],
-  "tasks": [
-    {
-      "id": "task-1",
-      "boardId": "default",
-      "title": "Task title",
-      "status": "todo",
-      "description": "Optional description",
-      "createdAt": "2025-01-06T10:00:00Z",
-      "updatedAt": "2025-01-06T10:00:00Z",
-      "priority": "high",
-      "tags": ["example", "custom-field"]
-    }
-  ],
-  "metadata": {
-    "version": "1.0",
-    "lastModified": "2025-01-06T10:00:00Z"
-  }
-}
-```
-
-### Common Operations
-
-**Add a task:**
-```json
-{
-  "id": "task-new-123",
-  "boardId": "default",
-  "title": "New task",
-  "status": "todo",
-  "createdAt": "2025-01-06T10:00:00Z",
-  "updatedAt": "2025-01-06T10:00:00Z"
-}
-```
-
-**Move a task:**
-```json
-// Change the "status" field to the target column id
-"status": "done"
-```
-
-**Add custom fields:**
-```json
-{
-  "id": "task-123",
-  "title": "Research task",
-  "status": "in-progress",
-  // Add any custom fields you want!
-  "priority": "high",
-  "estimatedHours": 4,
-  "assignee": "Doug",
-  "tags": ["research", "ai"]
-}
-```
-
-## Project Structure
-
-```
-tasky/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes for CRUD operations
-│   ├── layout.tsx         # Root layout with dark mode
-│   └── page.tsx           # Main kanban board page
-├── components/            # React components
-│   ├── board.tsx         # Main board component
-│   ├── column.tsx        # Column component
-│   ├── task-card.tsx     # Task card component
-│   └── ui/               # shadcn/ui components
-├── data/                 # Data storage
-│   └── tasks.json        # All tasks and boards
-├── docs/                 # Documentation
-│   └── LLM_GUIDE.md     # Guide for AI agents
-├── lib/                  # Utilities and types
-│   ├── tasks.ts         # File system utilities
-│   └── types.ts         # TypeScript types
-└── styles/
-    └── globals.css       # Global styles with CSS variables
-```
-
-## Tech Stack
-
-- **Framework**: Next.js 13+ (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Components**: shadcn/ui
-- **Icons**: Lucide React
-- **Theme**: next-themes
-
-## API Routes
-
-- `GET /api/tasks` - Get all tasks and boards
-- `GET /api/watch` - Server-Sent Events endpoint for real-time file watching
-- `POST /api/tasks` - Create a new task (for programmatic access)
-- `GET /api/tasks/[id]` - Get a specific task
-- `PUT /api/tasks/[id]` - Update a task
-- `DELETE /api/tasks/[id]` - Delete a task
-
-**Note:** The UI doesn't use the write endpoints - all task management happens via direct file editing by AI assistants.
-
-## Development
-
-### Quick Commands (Make)
-
-```bash
-make install       # One-time setup (installs everything)
-make dev          # Run dev server
-make build        # Build for production
-make mcp-build    # Build MCP server
-make mcp-watch    # Watch/rebuild MCP server
-make clean        # Clean everything
-make help         # Show all commands
-```
-
-### npm Scripts
-
-```bash
-npm run setup      # One-time setup
-npm run dev        # Run dev server
-npm run build      # Build for production
-npm start          # Run production server
-npm run typecheck  # Type check
-npm run lint       # Lint code
-npm run format:write  # Format code
-npm run mcp:build  # Build MCP server
-npm run mcp:watch  # Watch MCP server
-```
-
-### Workspaces
-
-Tasky uses npm workspaces to manage both the web app and MCP server in one repo. A single `npm install` at the root installs everything!
-
-## Managing Your Tasks
-
-Tasky supports both individual and team use through flexible configuration.
-
-### Individual Use (Keep Tasks Private)
-
-**Option 1: Environment Variable (Recommended)**
-
-Use a separate file for your personal tasks:
-
-```bash
-# 1. Copy the environment template
-cp .env.example .env.local
-
-# 2. Edit .env.local and uncomment/set:
-TASKS_FILE_PATH=data/my-tasks.json
-
-# 3. Copy the example data to your personal file
-cp data/tasks.json data/my-tasks.json
-
-# 4. Add your file to .gitignore
-echo "data/my-tasks.json" >> .gitignore
-```
-
-Now `data/tasks.json` stays as example data in git, and `data/my-tasks.json` contains your personal tasks (never committed). `.env.local` is already in `.gitignore` so your settings won't be committed.
-
-**Option 2: Gitignore the Default File**
-
-Simpler but less flexible:
-
-```bash
-# Add tasks.json to .gitignore
-echo "data/tasks.json" >> .gitignore
-```
-
-Your tasks stay on your machine only, but new users won't see example data.
-
-### Team Use (Share Tasks via Git)
-
-By default, `data/tasks.json` is tracked in Git, so you can share tasks with your team:
-
-```bash
-# Make changes via AI assistants
-# Tasks update automatically in data/tasks.json
-
-# Commit and push to share with team
-git add data/tasks.json
-git commit -m "Update tasks"
-git push
-```
-
-Everyone on your team will see the same tasks when they pull.
-
-### Manual Backup/Transfer
-
-You can also copy your tasks file (default: `data/tasks.json`) to:
-- Backup your tasks
-- Move between machines
-- Share with specific people
-
-## Contributing
-
-Contributions are welcome! This is an open-source project designed to be simple and extensible.
-
-## License
-
-MIT License - feel free to use this project for any purpose.
-
-## Credits
-
-Built with:
-- [Next.js](https://nextjs.org/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Radix UI](https://www.radix-ui.com/)
+---
+
+## How to Use Tasky
+
+### The Big Idea
+
+**You don't click buttons** to add or move tasks. Instead, you ai assistants what you want, and it does it for you!
+
+### Basic Examples
+
+Open Claude Code in the tasky folder and try these:
+
+1. **Add a task**
+   ```
+   "Add a task called 'Learn about MCPs' to my todo list"
+   ```
+
+2. **Move a task**
+   ```
+   "Move the 'Learn about MCPs' task to In Progress"
+   ```
+
+3. **See all your tasks**
+   ```
+   "Show me all my tasks"
+   ```
+
+4. **Create a high-priority task**
+   ```
+   "Add a high-priority task to research AI coding tools"
+   ```
+
+**Watch the board update in your browser** as Claude makes changes! It happens instantly.
+
+---
+
+## Understanding MCPs (The Cool Part!)
+
+### What is MCP?
+
+**MCP** stands for **Model Context Protocol**. Think of it as a way for AI assistants to interact directly with apps and tools.
+
+**Without MCP**: You'd have to manually edit files, and the AI couldn't really "do" things for you.
+
+**With MCP**: The AI can actually perform actions in your app - like adding tasks, searching, organizing, etc.
+
+### How Tasky Uses MCP
+
+When you tell Claude to "add a task," here's what happens:
+
+1. Claude understands what you want
+2. Claude uses Tasky's MCP tools (like `add_task`)
+3. The task gets added to your data
+4. The board updates automatically
+
+**You're learning**: How AI tools can directly interact with applications using MCPs!
+
+### What MCP Tools Does Tasky Have?
+
+Tasky gives Claude these "powers":
+
+- `add_task` - Create new tasks
+- `update_task` - Edit existing tasks
+- `move_task` - Move tasks between columns
+- `delete_task` - Remove tasks
+- `get_tasks` - View all tasks
+- `search_tasks` - Find tasks by keyword
+- `add_board` - Create new boards
+- `add_column` - Add new columns to boards
+
+**Try asking Claude**: "What MCP tools do you have available for Tasky?"
+
+---
+
+## Next Steps
+
+### Experiment!
+
+Now that it's working, try:
+
+1. **Add your own tasks**: Tell Claude about things you actually need to do
+2. **Create a new board**: "Create a board called 'Learning Projects'"
+3. **Search your tasks**: "Search for all tasks about learning"
+4. **Get creative**: See what Claude can do when you ask it to organize your tasks
+
+### Look at the Code
+
+Want to see how it works? Open these files in your code editor:
+
+- `data/tasks.json` - Your tasks are stored here as simple text
+- `components/board.tsx` - The visual board you see in the browser
+- `mcp-server/src/index.ts` - The MCP tools Claude uses
+
+**Don't worry if you don't understand everything** - just exploring helps you learn!
+
+### Learn More About MCPs
+
+- Ask Claude: "Explain how MCPs work in simple terms"
+- Read: [docs/MCP_SETUP.md](docs/MCP_SETUP.md) for more advanced setup
+- Experiment: Try building your own MCP tools (Claude can help!)
+
+---
+
+## Troubleshooting
+
+### "npm: command not found"
+- You need to install Node.js (see "What You'll Need" above)
+
+### Port 3737 is already in use
+- Something else is using that port. Try:
+  ```bash
+  npm run dev -- -p 3738
+  ```
+  Then open http://localhost:3738
+
+### Changes aren't showing up
+- Make sure `npm run dev` is still running in your Terminal
+- Refresh your browser (Cmd+R on Mac, Ctrl+R on Windows)
+
+### Claude says it can't find MCP tools
+- Make sure you're in the tasky folder when you open Claude Code
+- Try closing and reopening Claude Code
+
+---
+
+## Tips for Learning
+
+1. **Ask Claude to explain things**: "Explain what just happened when you added that task"
+2. **Look at the changes**: Open `data/tasks.json` to see how your tasks are stored
+3. **Experiment**: Try breaking things! It's just practice data, you can always reset
+4. **Take it slow**: You don't need to understand everything at once
+
+---
+
+## What's Next?
+
+Once you're comfortable with Tasky, you can:
+
+- **Modify the code**: Change colors, add new features, customize it!
+- **Build your own MCP server**: Create tools for other apps you use
+- **Share with friends**: Show others how AI coding tools work
+- **Use these skills**: Apply what you learned to other coding projects
+
+---
+
+## Get Help
+
+- **Ask Claude**: Seriously! Claude Code can help you understand any part of this project
+- **Check the docs**: [docs/LLM_GUIDE.md](docs/LLM_GUIDE.md) has more details
+- **GitHub Issues**: Report bugs or ask questions on the project's GitHub page
+
+---
+
+## Remember
+
+**You're learning by doing!** Every time you ask Claude to do something with Tasky, you're learning how modern AI-powered development works. Don't be afraid to experiment and make mistakes - that's how you learn.
+
+**Have fun building!** 🚀
