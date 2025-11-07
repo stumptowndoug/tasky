@@ -236,6 +236,126 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["query"],
         },
       },
+      {
+        name: "add_column",
+        description: "Add a new column to a board.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Board ID (defaults to 'default')",
+            },
+            columnId: {
+              type: "string",
+              description: "Unique column ID (e.g., 'review', 'testing') (required)",
+            },
+            name: {
+              type: "string",
+              description: "Display name for the column (required)",
+            },
+            order: {
+              type: "number",
+              description: "Order position (optional, defaults to end of list)",
+            },
+          },
+          required: ["columnId", "name"],
+        },
+      },
+      {
+        name: "update_column",
+        description: "Update a column's properties (name and/or order).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Board ID (defaults to 'default')",
+            },
+            columnId: {
+              type: "string",
+              description: "Column ID to update (required)",
+            },
+            name: {
+              type: "string",
+              description: "New display name (optional)",
+            },
+            order: {
+              type: "number",
+              description: "New order position (optional)",
+            },
+          },
+          required: ["columnId"],
+        },
+      },
+      {
+        name: "delete_column",
+        description: "Delete a column from a board. Note: This will not delete tasks in that column, but orphaned tasks won't be visible.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Board ID (defaults to 'default')",
+            },
+            columnId: {
+              type: "string",
+              description: "Column ID to delete (required)",
+            },
+          },
+          required: ["columnId"],
+        },
+      },
+      {
+        name: "update_board",
+        description: "Update board properties like the board name.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Board ID (defaults to 'default')",
+            },
+            name: {
+              type: "string",
+              description: "New board name (required)",
+            },
+          },
+          required: ["name"],
+        },
+      },
+      {
+        name: "add_board",
+        description: "Create a new board with default columns (todo, in-progress, done). You can customize columns afterward.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Unique board ID (e.g., 'project-alpha', 'personal') (required)",
+            },
+            name: {
+              type: "string",
+              description: "Display name for the board (required)",
+            },
+          },
+          required: ["boardId", "name"],
+        },
+      },
+      {
+        name: "delete_board",
+        description: "Delete a board and all its tasks. This action cannot be undone.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardId: {
+              type: "string",
+              description: "Board ID to delete (required)",
+            },
+          },
+          required: ["boardId"],
+        },
+      },
     ],
   };
 });
@@ -453,6 +573,300 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: "text",
               text: `Found ${results.length} task(s):\n\n${JSON.stringify(results, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case "add_column": {
+        const data = await readTasksData();
+        const boardId = args.boardId || "default";
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+
+        if (boardIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${boardId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        // Check if column ID already exists
+        const existingColumn = data.boards[boardIndex].columns.find(
+          (c: any) => c.id === args.columnId
+        );
+        if (existingColumn) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Column with ID "${args.columnId}" already exists.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const newColumn = {
+          id: args.columnId,
+          name: args.name,
+          order: args.order !== undefined ? args.order : data.boards[boardIndex].columns.length,
+        };
+
+        data.boards[boardIndex].columns.push(newColumn);
+
+        // Sort columns by order
+        data.boards[boardIndex].columns.sort((a: any, b: any) => a.order - b.order);
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Column added successfully!\n\n${JSON.stringify(newColumn, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case "update_column": {
+        const data = await readTasksData();
+        const boardId = args.boardId || "default";
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+
+        if (boardIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${boardId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const columnIndex = data.boards[boardIndex].columns.findIndex(
+          (c: any) => c.id === args.columnId
+        );
+
+        if (columnIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Column with ID "${args.columnId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        if (args.name !== undefined) {
+          data.boards[boardIndex].columns[columnIndex].name = args.name;
+        }
+
+        if (args.order !== undefined) {
+          data.boards[boardIndex].columns[columnIndex].order = args.order;
+          // Sort columns by order
+          data.boards[boardIndex].columns.sort((a: any, b: any) => a.order - b.order);
+        }
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Column updated successfully!\n\n${JSON.stringify(data.boards[boardIndex].columns[columnIndex], null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case "delete_column": {
+        const data = await readTasksData();
+        const boardId = args.boardId || "default";
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+
+        if (boardIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${boardId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const columnIndex = data.boards[boardIndex].columns.findIndex(
+          (c: any) => c.id === args.columnId
+        );
+
+        if (columnIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Column with ID "${args.columnId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const deletedColumn = data.boards[boardIndex].columns[columnIndex];
+        data.boards[boardIndex].columns.splice(columnIndex, 1);
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Column deleted successfully!\n\nDeleted: ${deletedColumn.name} (${deletedColumn.id})`,
+            },
+          ],
+        };
+      }
+
+      case "update_board": {
+        const data = await readTasksData();
+        const boardId = args.boardId || "default";
+        const boardIndex = data.boards.findIndex((b: any) => b.id === boardId);
+
+        if (boardIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${boardId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        data.boards[boardIndex].name = args.name;
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Board updated successfully!\n\n${JSON.stringify(data.boards[boardIndex], null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case "add_board": {
+        const data = await readTasksData();
+
+        // Check if board ID already exists
+        const existingBoard = data.boards.find((b: any) => b.id === args.boardId);
+        if (existingBoard) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${args.boardId}" already exists.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const newBoard = {
+          id: args.boardId,
+          name: args.name,
+          columns: [
+            {
+              id: "todo",
+              name: "To Do",
+              order: 0,
+            },
+            {
+              id: "in-progress",
+              name: "In Progress",
+              order: 1,
+            },
+            {
+              id: "done",
+              name: "Done",
+              order: 2,
+            },
+          ],
+        };
+
+        data.boards.push(newBoard);
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Board created successfully!\n\n${JSON.stringify(newBoard, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case "delete_board": {
+        const data = await readTasksData();
+        const boardIndex = data.boards.findIndex((b: any) => b.id === args.boardId);
+
+        if (boardIndex === -1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Board with ID "${args.boardId}" not found.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        // Prevent deleting the default board if it's the only one
+        if (data.boards.length === 1) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error: Cannot delete the only remaining board.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const deletedBoard = data.boards[boardIndex];
+
+        // Delete the board
+        data.boards.splice(boardIndex, 1);
+
+        // Delete all tasks associated with this board
+        const tasksBeforeCount = data.tasks.length;
+        data.tasks = data.tasks.filter((t: any) => t.boardId !== args.boardId);
+        const tasksDeletedCount = tasksBeforeCount - data.tasks.length;
+
+        await writeTasksData(data);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Board deleted successfully!\n\nDeleted: ${deletedBoard.name} (${deletedBoard.id})\nTasks deleted: ${tasksDeletedCount}`,
             },
           ],
         };

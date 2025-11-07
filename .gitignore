@@ -34,3 +34,6 @@ yarn-error.log*
 
 .contentlayer
 .env
+
+# temp files
+data/*.tmp
